@@ -19,7 +19,7 @@ shiny::runGitHub("HonestDiDSenAnlys", "ccfang2")
 
 2. Alternatively, you can access the online version of this shiny app [here](). Unfortunately, total usage duration could not be more than 25 hours per month as I use free versions of shiny apps.
 
-## Introduction
+## About this app
 
 ### Screenshot
 ![Screenshot](https://user-images.githubusercontent.com/100428466/202920286-44f022f2-ca89-406f-8801-763e4df67519.gif)
@@ -35,7 +35,7 @@ shiny::runGitHub("HonestDiDSenAnlys", "ccfang2")
 2. R code is provided each time you run an analysis on this app. So, for R users, you could copy and paste the produced R code in your own R console, and will get exactly the same outputs as shown in the app. The produced R code makes your analysis more flexible as you can revise it to your own need.
 3. Analysis results and plots are downloadable by a simple click of buttons. But, please be reminded that only the latest analysis results and plots are accessible, so download them timely if needed.
 
-### Instruction
+### Instructions
 Please watch this Youtube [video]() for detailed instruction. This video is also embeded in this shiny app.
 
 ## Contact
