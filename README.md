@@ -22,7 +22,8 @@ shiny::runGitHub("HonestDiDSenAnlys", "ccfang2")
 ## About this app
 
 ### Screenshot
-![Screenshot](https://user-images.githubusercontent.com/100428466/202920286-44f022f2-ca89-406f-8801-763e4df67519.gif)
+<img width="1376" alt="Screen Shot" src="https://user-images.githubusercontent.com/100428466/202984247-dab10d33-d6c1-4efd-a7df-e80de1a41f40.png">
+
 
 ### What does this app do for you
 1. Sensitivity analysis for example papers discussed in [Rambachan and Roth (2022)](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf)
@@ -36,7 +37,7 @@ shiny::runGitHub("HonestDiDSenAnlys", "ccfang2")
 3. Analysis results and plots are downloadable by a simple click of buttons. But, please be reminded that only the latest analysis results and plots are accessible, so download them timely if needed.
 
 ### Instructions
-Please watch this Youtube [video]() for detailed instruction. This video is also embeded in this shiny app.
+Please watch this Youtube [video](https://www.youtube.com/watch?v=PyY-2ptiLTU) for detailed instruction. This video is also embeded in this Shiny app.
 
 ## Contact
 I hope you enjoy using this app. Any comments or questions are welcome at [ccfang[at]uni-bonn.de](mailto:ccfang@uni-bonn.de).
