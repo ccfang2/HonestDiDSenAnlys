@@ -17,7 +17,7 @@ library(shiny)
 shiny::runGitHub("HonestDiDSenAnlys", "ccfang2")
 ```
 
-2. Alternatively, you can access the online version of this shiny app [here](). Unfortunately, total usage duration could not be more than 25 hours per month as I use free versions of shiny apps.
+2. Alternatively, you can access the online version of this shiny app [here](https://ccfang2.shinyapps.io/HonestDiDSenAnlys/). Unfortunately, total usage duration could not be more than 25 hours per month as I use free versions of shiny apps.
 
 ## About this app
 
