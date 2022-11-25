@@ -58,23 +58,14 @@ Examples <- tabPanel("Examples", fluid = TRUE, icon = icon("magnifying-glass"),
                                                     ),
                                      selected = 1),
                          # Step 2
-                         tags$div(title="Fixed Length Confidence Intervals and Conditional FLCI Hybrid only work when smoothness restriction is the only base restriction at [ Step 3 ].",
-                                  p(strong(span("[ Step 2 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
-                         radioButtons("example_method","Select a method to construct confidence interval",
-                                      choices = list("Conditional"="Conditional",
-                                                     "Conditional Least Favorable Hybrid"="C-LF",
-                                                     "Fixed Length Confidence Intervals"="FLCI",
-                                                     "Conditional FLCI Hybrid"="C-F"),
-                                      selected = "C-LF"),
-                         # Step 3
                          tags$div(title="At least one base delta must be selected, while sign and monotonicity restrictions are optional. Importantly, if Bounding Relative Magnitudes is included in the base delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions.",
-                                  p(strong(span("[ Step 3 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
+                                  p(strong(span("[ Step 2 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
                          fluidRow(column(4,
                                          # Select base choice of Delta
                                          checkboxGroupInput("example_delta","Base choice of Delta",
-                                                            choices = list("Smoothness restriction"=1,
-                                                                           "Bounding Relative Magnitudes"=2),
-                                                            selected = 1)
+                                                            choices = list("Bounding Relative Magnitudes"=2,   
+                                                                           "Smoothness restriction"=1), 
+                                                            selected = 2)  
                                          ),
                                   column(4, offset = 0,
                                          # Select Sign restrictions
@@ -93,19 +84,56 @@ Examples <- tabPanel("Examples", fluid = TRUE, icon = icon("magnifying-glass"),
                                                       selected = 1)
                                          )
                                   ),
+                         # Step 3
+                         tags$div(title="If 'Smoothness Restriction' is the only base Delta chosen at Step [2], then the default method here is 'Fixed Length Confidence Intervals'. \n \n If 'Bounding Relative Magnitudes' is included in the base Delta, then the default method here is 'Conditional Least Favorable Hybrid'. \n \n Fixed Length Confidence Intervals and Conditional FLCI Hybrid only work when smoothness restriction is the only base restriction at [ Step 2 ].",
+                                  p(strong(span("[ Step 3 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
+                         conditionalPanel(
+                           condition = "input.example_delta == '1'", #JS expression
+                           radioButtons("example_method_sd","Select a method to construct confidence interval",
+                                        choices = list("Conditional"="Conditional",
+                                                       "Conditional Least Favorable Hybrid"="C-LF",
+                                                       "Fixed Length Confidence Intervals"="FLCI",
+                                                       "Conditional FLCI Hybrid"="C-F"),
+                                        selected = "FLCI")
+                         ),
+                         conditionalPanel(
+                           condition = c("input.example_delta.includes('2') | input.example_delta == ''"), #JS expression
+                           radioButtons("example_method_rm","Select a method to construct confidence interval",
+                                        choices = list("Conditional"="Conditional",
+                                                       "Conditional Least Favorable Hybrid"="C-LF",
+                                                       "Fixed Length Confidence Intervals"="FLCI",
+                                                       "Conditional FLCI Hybrid"="C-F"),
+                                        selected = "C-LF")
+                         ),
                          # Step 4
-                         tags$div(title="If ONLY smoothness restriction is selected as the base Delta, the vector you enter below is a vector of M values, which is needed to define smoothness restriction. \n \n Otherwise, if bounding relative magnitudes is included in base Delta, then the vector you enter below is a vector of Mbar values, which is needed to define the restriction of bounding relative magitudes. \n \n There are two ways to enter the vector. You can either enter an arbitrary vector with numbers being seperated by commas (e.g., 0.05, 0.1, 0.15, 0.2), or enter a sequence with lower, upper bounds and step (e.g., lower=0.05, upper=0.2, step=0.05). All numbers you enter must be non-negative. It is NOT allowed to enter a vector in BOTH ways simultaneously. \n \n As a special case, if you are unsure about how large M or Mbar could be and prefer to using default values, then it is HIGHLY suggested to just leave them blank. Please go to [ More ] > [ FAQ ] for details on the default values.",
+                         tags$div(title="If ONLY smoothness restriction is selected as the base Delta, the vector you enter below is a vector of M values, which is needed to define smoothness restriction. \n \n Otherwise, if bounding relative magnitudes is included in base Delta, then the vector you enter below is a vector of Mbar values, which is needed to define the restriction of bounding relative magitudes. \n \n There are two ways to enter the vector. You can either enter an arbitrary vector with numbers being seperated by commas (e.g., 0.25, 0.5, 0.75, 1, 1.25), or enter a sequence with lower, upper bounds and step (e.g., lower=0.25, upper=1.25, step=0.25). All numbers you enter must be non-negative. It is NOT allowed to enter a vector in BOTH ways simultaneously. \n \n As a special case, if you are unsure about how large M or Mbar could be and prefer to using default values, then it is HIGHLY suggested to just leave them blank. The default values of Mbars are already visible at [ Step 4 ]. For default values of M, please go to [ More ] > [ FAQ ] for details.",
                                   p(strong(span("[ Step 4 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
-                         uiOutput("example_mmbar_note"),
-                         p("EITHER enter an arbitrary vector"),
-                         textInput("example_mmbar_textinput", NULL, 
-                                   value = ""),
-                         p("OR enter the vector by defining a sequence"),
-                         fluidRow(
-                           column(3,numericInput("example_mmbar_lower", "Lower", value = "")),
-                           column(3,numericInput("example_mmbar_upper", "Upper", value = "")),
-                           column(6,numericInput("example_mmbar_step", "Step", value = ""))
-                           ),
+                         conditionalPanel(
+                           condition = "input.example_delta == '1'", # JS expression
+                           p("Enter a vector of M to define the base Delta you select at [ Step 2 ]"),
+                           p("EITHER enter an arbitrary vector"),
+                           textInput("example_m_textinput", NULL, 
+                                     value = ""),
+                           p("OR enter the vector by defining a sequence"),
+                           fluidRow(
+                             column(3,numericInput("example_m_lower", "Lower", value = "")),
+                             column(3,numericInput("example_m_upper", "Upper", value = "")),
+                             column(6,numericInput("example_m_step", "Step", value = ""))
+                           )
+                         ),
+                         conditionalPanel(
+                           condition = c("input.example_delta.includes('2') | input.example_delta == ''"), # JS expression
+                           p("Enter a vector of Mbar to define the base Delta you select at [ Step 2 ]"),
+                           p("EITHER enter an arbitrary vector"),
+                           textInput("example_mbar_textinput", NULL,
+                                     value = ""),
+                           p("OR enter the vector by defining a sequence"),
+                           fluidRow(
+                             column(3,numericInput("example_mbar_lower", "Lower", value = 0.25)),
+                             column(3,numericInput("example_mbar_upper", "Upper", value = 1.25)),
+                             column(6,numericInput("example_mbar_step", "Step", value = 0.25))
+                           )
+                         ),
                          # Step 5
                          tags$div(title=" Examples: \n 1 indicates the first post-treatment period; \n 1,2 indicates the first two post-treatment periods; \n 1,2,3 means indicates the first three post-treatment periods; \n Leave it blank if you are interested in all post-treatment periods. \n \n This app will give the same weight to the period(s) that you enter when computing weight vector. It means that the average causal effect over those period(s) will be considered, as this is the most common parameter of interest for researchers. \n If you need to give different weights, please revise the produced R code accordingly and run it locally.",
                                   p(strong(span("[ Step 5 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
@@ -126,7 +154,7 @@ Examples <- tabPanel("Examples", fluid = TRUE, icon = icon("magnifying-glass"),
                          useShinyjs(),
                          tags$div(title="\n You are HIGHLY suggested to leave lower and upper bounds blank, so default values will be used. \n \n However, this step will be super helpful when the lower or upper bounds of your output confidence sets turn out to be exactly the same for different Mbar. Then, you need to adjust the bounds of grid for test inversion here in order to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details. \n \n Also, you are HIGHLY suggested to leave number of grid points as is given (=1000), but it's okay to change it for computational reasons.",
                                   hidden(p(id="example_grid_hint",strong(span("[ Step 8 ] : ", style="color:black")), span(" [ Hover to see hints ] ")))),
-                         hidden(p(id="example_grid_note","Enter the lower and upper bounds of grid as well as the number of grid points which will be used for underlying test inversion because the restriction of bounding relative magnitudes is included in your base Delta at [ Step 3 ].")),
+                         hidden(p(id="example_grid_note","Enter the lower and upper bounds of grid as well as the number of grid points which will be used for underlying test inversion because the restriction of bounding relative magnitudes is included in your base Delta at [ Step 2 ].")),
                            fluidRow(
                              column(3,hidden(numericInput("example_grid_lb","Lower", value = ""))),
                              column(3,hidden(numericInput("example_grid_ub","Upper", value = ""))),
@@ -220,23 +248,14 @@ OwnData <- tabPanel("Analyze Your Own Data", fluid = TRUE, icon = icon("pen-to-s
                                  p(strong(span("[ Step 1 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
                         uiOutput("owndata_fileupload"),
                         # Step 2
-                        tags$div(title="Fixed Length Confidence Intervals and Conditional FLCI Hybrid only work when smoothness restriction is the only base restriction at [ Step 3 ].",
-                                 p(strong(span("[ Step 2 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
-                        radioButtons("owndata_method","Select a method to construct confidence interval",
-                                     choices = list("Conditional"="Conditional",
-                                                    "Conditional Least Favorable Hybrid"="C-LF",
-                                                    "Fixed Length Confidence Intervals"="FLCI",
-                                                    "Conditional FLCI Hybrid"="C-F"),
-                                     selected = "C-LF"),
-                        # Step 3
                         tags$div(title="At least one base delta must be selected, while sign and monotonicity restrictions are optional. Importantly, if Bounding Relative Magnitudes is included in the base delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions.",
-                                 p(strong(span("[ Step 3 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
+                                 p(strong(span("[ Step 2 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
                         fluidRow(column(4,
                                         # Select base choice of Delta
                                         checkboxGroupInput("owndata_delta","Base choice of Delta",
-                                                           choices = list("Smoothness restriction"=1,
-                                                                          "Bounding Relative Magnitudes"=2),
-                                                           selected = 1)
+                                                           choices = list("Bounding Relative Magnitudes"=2,   
+                                                                          "Smoothness restriction"=1),  
+                                                           selected = 2)  
                                         ),
                                  column(4, offset = 0,
                                         # Select Sign restrictions
@@ -255,19 +274,56 @@ OwnData <- tabPanel("Analyze Your Own Data", fluid = TRUE, icon = icon("pen-to-s
                                                      selected = 1)
                                         )
                                  ),
+                        # Step 3
+                        tags$div(title="If 'Smoothness Restriction' is the only base Delta chosen at Step [2], then the default method here is 'Fixed Length Confidence Intervals'. \n \n If 'Bounding Relative Magnitudes' is included in the base Delta, then the default method here is 'Conditional Least Favorable Hybrid'. \n \n Fixed Length Confidence Intervals and Conditional FLCI Hybrid only work when smoothness restriction is the only base restriction at [ Step 2 ].",
+                                 p(strong(span("[ Step 3 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
+                        conditionalPanel(
+                          condition = "input.owndata_delta == '1'", #JS expression
+                          radioButtons("owndata_method_sd","Select a method to construct confidence interval",
+                                       choices = list("Conditional"="Conditional",
+                                                      "Conditional Least Favorable Hybrid"="C-LF",
+                                                      "Fixed Length Confidence Intervals"="FLCI",
+                                                      "Conditional FLCI Hybrid"="C-F"),
+                                       selected = "FLCI")
+                        ),
+                        conditionalPanel(
+                          condition = c("input.owndata_delta.includes('2') | input.owndata_delta == ''"), #JS expression
+                          radioButtons("owndata_method_rm","Select a method to construct confidence interval",
+                                       choices = list("Conditional"="Conditional",
+                                                      "Conditional Least Favorable Hybrid"="C-LF",
+                                                      "Fixed Length Confidence Intervals"="FLCI",
+                                                      "Conditional FLCI Hybrid"="C-F"),
+                                       selected = "C-LF")
+                        ),
                         # Step 4
-                        tags$div(title="If ONLY smoothness restriction is selected as the base Delta, the vector you enter below is a vector of M values, which is needed to define smoothness restriction. \n \n Otherwise, if bounding relative magnitudes is included in base Delta, then the vector you enter below is a vector of Mbar values, which is needed to define the restriction of bounding relative magitudes. \n \n There are two ways to enter the vector. You can either enter an arbitrary vector with numbers being seperated by commas (e.g., 0.05, 0.1, 0.15, 0.2), or enter a sequence with lower, upper bounds and step (e.g., lower=0.05, upper=0.2, step=0.05). All numbers you enter must be non-negative. It is NOT allowed to enter a vector in BOTH ways simultaneously. \n \n As a special case, if you are unsure about how large M or Mbar could be and prefer to using default values, then it is HIGHLY suggested to just leave them blank. Please go to [ More ] > [ FAQ ] for details on the default values.",
+                        tags$div(title="If ONLY smoothness restriction is selected as the base Delta, the vector you enter below is a vector of M values, which is needed to define smoothness restriction. \n \n Otherwise, if bounding relative magnitudes is included in base Delta, then the vector you enter below is a vector of Mbar values, which is needed to define the restriction of bounding relative magitudes. \n \n There are two ways to enter the vector. You can either enter an arbitrary vector with numbers being seperated by commas (e.g., 0.25, 0.5, 0.75, 1, 1.25), or enter a sequence with lower, upper bounds and step (e.g., lower=0.25, upper=1.25, step=0.25). All numbers you enter must be non-negative. It is NOT allowed to enter a vector in BOTH ways simultaneously. \n \n As a special case, if you are unsure about how large M or Mbar could be and prefer to using default values, then it is HIGHLY suggested to just leave them blank. The default values of Mbars are already visible at [ Step 4 ]. For default values of M, please go to [ More ] > [ FAQ ] for details.",
                                  p(strong(span("[ Step 4 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
-                        uiOutput("owndata_mmbar_note"),
-                        p("EITHER enter an arbitrary vector"),
-                        textInput("owndata_mmbar_textinput", NULL, 
-                                  value = ""),
-                        p("OR enter the vector by defining a sequence"),
-                        fluidRow(
-                          column(3,numericInput("owndata_mmbar_lower", "Lower", value = "")),
-                          column(3,numericInput("owndata_mmbar_upper", "Upper", value = "")),
-                          column(6,numericInput("owndata_mmbar_step", "Step", value = ""))
-                          ),
+                        conditionalPanel(
+                          condition = "input.owndata_delta == '1'", # JS expression
+                          p("Enter a vector of M to define the base Delta you select at [ Step 2 ]"),
+                          p("EITHER enter an arbitrary vector"),
+                          textInput("owndata_m_textinput", NULL, 
+                                    value = ""),
+                          p("OR enter the vector by defining a sequence"),
+                          fluidRow(
+                            column(3,numericInput("owndata_m_lower", "Lower", value = "")),
+                            column(3,numericInput("owndata_m_upper", "Upper", value = "")),
+                            column(6,numericInput("owndata_m_step", "Step", value = ""))
+                          )
+                        ),
+                        conditionalPanel(
+                          condition = c("input.owndata_delta.includes('2') | input.owndata_delta == ''"), # JS expression
+                          p("Enter a vector of Mbar to define the base Delta you select at [ Step 2 ]"),
+                          p("EITHER enter an arbitrary vector"),
+                          textInput("owndata_mbar_textinput", NULL,
+                                    value = ""),
+                          p("OR enter the vector by defining a sequence"),
+                          fluidRow(
+                            column(3,numericInput("owndata_mbar_lower", "Lower", value = 0.25)),
+                            column(3,numericInput("owndata_mbar_upper", "Upper", value = 1.25)),
+                            column(6,numericInput("owndata_mbar_step", "Step", value = 0.25))
+                          )
+                        ),
                         # Step 5
                         tags$div(title=" Examples: \n 1 indicates the first post-treatment period; \n 1,2 indicates the first two post-treatment periods; \n 1,2,3 means indicates the first three post-treatment periods; \n Leave it blank if you are interested in all post-treatment periods. \n \n This app will give the same weight to the period(s) that you enter when computing weight vector. It means that the average causal effect over those period(s) will be considered, as this is the most common parameter of interest for researchers. \n If you need to give different weights, please revise the produced R code accordingly and run it locally.",
                                  p(strong(span("[ Step 5 ] : ", style="color:black")), span(" [ Hover to see hints ] "))),
@@ -288,7 +344,7 @@ OwnData <- tabPanel("Analyze Your Own Data", fluid = TRUE, icon = icon("pen-to-s
                         useShinyjs(),
                         tags$div(title="\n You are HIGHLY suggested to leave lower and upper bounds blank, so default values will be used. \n \n However, this step will be super helpful when the lower or upper bounds of your output confidence sets turn out to be exactly the same for different Mbar. Then, you need to adjust the bounds of grid for test inversion here in order to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details. \n \n Also, you are HIGHLY suggested to leave number of grid points as is given (=1000), but it's okay to change it for computational reasons.",
                                  hidden(p(id="owndata_grid_hint",strong(span("[ Step 8 ] : ", style="color:black")), span(" [ Hover to see hints ] ")))),
-                        hidden(p(id="owndata_grid_note","Enter the lower and upper bounds of grid as well as the number of grid points which will be used for underlying test inversion because the restriction of bounding relative magnitudes is included in your base Delta at [ Step 3 ].")),
+                        hidden(p(id="owndata_grid_note","Enter the lower and upper bounds of grid as well as the number of grid points which will be used for underlying test inversion because the restriction of bounding relative magnitudes is included in your base Delta at [ Step 2 ].")),
                         fluidRow(
                           column(3,hidden(numericInput("owndata_grid_lb","Lower", value = ""))),
                           column(3,hidden(numericInput("owndata_grid_ub","Upper", value = ""))),
@@ -636,9 +692,9 @@ More <- navbarMenu("More", icon = icon("list"),
                                       p(span("This vector of indices is used to compute the", em("l"),"vector discussed in the original paper", a("Rambachan and Roth (2022).", href="https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf"),"Here, if you are interested in a single post-treatment period, then enter the relative number of that period. For example, 1 means the first post-treatment
                                              period. If you are interested in multiple post-treatment periods, then enter the numbers with a comma in between. For example, 1,2,3 means the first three post-treatment periods. Then, the same weight will be given to the period(s) that you enter to compute", em("l"), "vector. It means that the average causal effect over those period(s) will be considered, as this is the most common parameter of interest for researchers. 
                                              If you need to give different weights to",em("l"),"vector, please revise the produced R code accordingly and run it locally. As a special case, if you are interested in average effect over all post-treatment periods, then just leave the box blank."), style="font-weight: normal")),
-                              tags$li(p("How does the default values of M and Mbar are defined if I leave [ Step 4 ] of [ Examples ] or [ Analyze Your Own Data ] blank?"),
+                              tags$li(p("What are the default values of M and Mbar at [ Step 4 ] of [ Examples ] or [ Analyze Your Own Data ]?"),
                                       p(span("By default, vector of M is a grid of length 10 that starts at M = 0 and ends at M equal to the upper bound constructed from the pre-periods using the function", code("DeltaSD_upperBound_Mpre") ,"which can be found in" ,a("HonestDiD", href="https://github.com/asheshrambachan/HonestDiD"), "package if number of pre-periods > 1 or the standard deviation of the first pre-period coefficient if number of pre-periods = 1."), style="font-weight: normal"),
-                                      p(span("Whereas, by default, vector of Mbar is a grid of length 10 that starts at Mbar = 0 and ends at Mbar = 2."), style="font-weight: normal")),
+                                      p(span("Whereas, by default, vector of Mbar is a grid of length 5 that starts at Mbar = 0.25 and ends at Mbar = 1.25. Please be aware that the default values of Mbar in"), a("HonestDiD", href="https://github.com/asheshrambachan/HonestDiD"), span("package is different, which has a grid of length 10 that starts at Mbar = 0 and ends at Mbar = 2."), style="font-weight: normal")),
                               tags$li(p("What should I do if the lower (upper) bounds of confidence set turn out to be exactly the same for different Mbars?"),
                                       p(span("This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small) in your setup. You need to decrease (increase) it to get correct confidence sets. By default, the upper bound of grid used for underlying test inversion is equal to twenty times the standard deviation of the estimated target parameter (i.e., weight vector", code("%*%") ,"post-treatment event-study coefficient vector). Whereas, lower bound of grid is equal to negative twenty times the standard deviation of the estimated target parameter."), style="font-weight: normal")),
                               tags$li(p("What does [Step 7] of [ Examples ] or [ Analyze Your Own Data ] indicate?"),
