@@ -33,17 +33,6 @@ server <- function(input, output, session) {
   # *****************************************************************
   
   # ------------ Alerts----------------------------------------------
-  # Alert below will trigger if FLCI or Conditional FLCI is chosen for any restrictions other than SD
-  observe({
-    if (all(input$example_method %in% c("FLCI", "C-F"), 
-            "2" %in% input$example_delta)) {
-      example_flci_check <- "Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions."
-      example_flci_js_string <- 'alert("SOMETHING");'
-      example_flci_js_string <- sub("SOMETHING",example_flci_check,example_flci_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = example_flci_js_string))
-    }
-  })
-  
   # Alert below will trigger if no base delta is selected
   observe({
     if (is.null(input$example_delta)) {
@@ -51,8 +40,8 @@ server <- function(input, output, session) {
       example_base_delta_js_string <- 'alert("SOMETHING");'
       example_base_delta_js_string <- sub("SOMETHING",example_base_delta_check,example_base_delta_js_string)
       session$sendCustomMessage(type='jsCode', list(value = example_base_delta_js_string))
-      }
-    })
+    }
+  })
   
   # Alert below will trigger if both optional restrictions are selected when Bounding Relative Magnitudes is included in base Delta
   observe({
@@ -61,9 +50,20 @@ server <- function(input, output, session) {
       example_optional_delta_js_string <- 'alert("SOMETHING");'
       example_optional_delta_js_string <- sub("SOMETHING",example_optional_delta_check,example_optional_delta_js_string)
       session$sendCustomMessage(type='jsCode', list(value = example_optional_delta_js_string))
-      }
-    })
+    }
+  })
   
+  # Alert below will trigger if FLCI or Conditional FLCI is chosen for any base restrictions other than single SD
+  observe({
+    if (all(input$example_method_rm %in% c("FLCI", "C-F"), 
+            "2" %in% input$example_delta)) {
+      example_flci_check <- "Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions."
+      example_flci_js_string <- 'alert("SOMETHING");'
+      example_flci_js_string <- sub("SOMETHING",example_flci_check,example_flci_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_flci_js_string))
+    }
+  })
+
   # Alert below will trigger if l vector is wrongly formatted
   observe({
     if (
@@ -78,55 +78,104 @@ server <- function(input, output, session) {
       }
     })
   
-  # Alert below will trigger if textinput mmbar vector is wrongly formatted
+  # Alert below will trigger if textinput m vector is wrongly formatted
   observe({
     if (
-      any(NA %in% (mod(as.numeric(unlist(strsplit(input$example_mmbar_textinput,","))),1)!=0),
-          any(as.numeric(unlist(strsplit(input$example_mmbar_textinput,",")))<0))
+      any(NA %in% (mod(as.numeric(unlist(strsplit(input$example_m_textinput,","))),1)!=0),
+          any(as.numeric(unlist(strsplit(input$example_m_textinput,",")))<0))
     ) {
-      example_mmbar_textinput_check <- "The vector of M or Mbar must consist of numbers being seperated by commas. Numbers must be non-negative. Please check examples in hints."
-      example_mmbar_textinput_js_string <- 'alert("SOMETHING");'
-      example_mmbar_textinput_js_string <- sub("SOMETHING",example_mmbar_textinput_check,example_mmbar_textinput_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = example_mmbar_textinput_js_string))
+      example_m_textinput_check <- "The vector of M must consist of numbers being seperated by commas. Numbers must be non-negative. Please check examples in hints."
+      example_m_textinput_js_string <- 'alert("SOMETHING");'
+      example_m_textinput_js_string <- sub("SOMETHING",example_m_textinput_check,example_m_textinput_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_m_textinput_js_string))
     }
   })
   
-  # Alert below will trigger if both textinput and sequence mmbar vector are defined
+  # Alert below will trigger if both textinput and sequence m vector are defined
   observe({
     if (
-      all(input$example_mmbar_textinput !="",
-          any(!is.na(input$example_mmbar_lower), !is.na(input$example_mmbar_upper), !is.na(input$example_mmbar_step)))
+      all(input$example_m_textinput !="",
+          any(!is.na(input$example_m_lower), !is.na(input$example_m_upper), !is.na(input$example_m_step)))
     ) {
-      example_mmbar_text_seq_check <- "You can enter the vector of M or Mbar EITHER arbitrarily OR as a sequence, but NOT both."
-      example_mmbar_text_seq_js_string <- 'alert("SOMETHING");'
-      example_mmbar_text_seq_js_string <- sub("SOMETHING",example_mmbar_text_seq_check,example_mmbar_text_seq_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = example_mmbar_text_seq_js_string))
+      example_m_text_seq_check <- "You can enter the vector of M EITHER arbitrarily OR as a sequence, but NOT both."
+      example_m_text_seq_js_string <- 'alert("SOMETHING");'
+      example_m_text_seq_js_string <- sub("SOMETHING",example_m_text_seq_check,example_m_text_seq_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_m_text_seq_js_string))
     }
   })
   
-  # Alert below will trigger if any of lower, upper, step in the sequence mmbar vector is negative 
+  # Alert below will trigger if any of lower, upper, step in the sequence m vector is negative 
   observe({
-    if (any(all(!is.na(input$example_mmbar_lower), input$example_mmbar_lower <0),
-            all(!is.na(input$example_mmbar_upper), input$example_mmbar_upper <0),
-            all(!is.na(input$example_mmbar_step), input$example_mmbar_step <0))) {
-      example_mmbar_seq_neg_check <- "Lower and upper bounds as well as step of the M or Mbar sequence must be non-negative."
-      example_mmbar_seq_neg_js_string <- 'alert("SOMETHING");'
-      example_mmbar_seq_neg_js_string <- sub("SOMETHING",example_mmbar_seq_neg_check,example_mmbar_seq_neg_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = example_mmbar_seq_neg_js_string))
+    if (any(all(!is.na(input$example_m_lower), input$example_m_lower <0),
+            all(!is.na(input$example_m_upper), input$example_m_upper <0),
+            all(!is.na(input$example_m_step), input$example_m_step <0))) {
+      example_m_seq_neg_check <- "Lower and upper bounds as well as step of the M sequence must be non-negative."
+      example_m_seq_neg_js_string <- 'alert("SOMETHING");'
+      example_m_seq_neg_js_string <- sub("SOMETHING",example_m_seq_neg_check,example_m_seq_neg_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_m_seq_neg_js_string))
     }
   })
   
-  # Alert below will trigger if any of lower, upper, step in the sequence mmbar vector is wrongly defined
+  # Alert below will trigger if any of lower, upper, step in the sequence m vector is wrongly defined
   observe({
-    if (any(all(!is.na(input$example_mmbar_lower), !is.na(input$example_mmbar_upper), input$example_mmbar_lower > input$example_mmbar_upper),
-            all(!is.na(input$example_mmbar_lower), !is.na(input$example_mmbar_upper), !is.na(input$example_mmbar_step), input$example_mmbar_step > input$example_mmbar_upper - input$example_mmbar_lower))) {
-      example_mmbar_seq_step_check <- "Lower bound of the M or Mbar sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds."
-      example_mmbar_seq_step_js_string <- 'alert("SOMETHING");'
-      example_mmbar_seq_step_js_string <- sub("SOMETHING",example_mmbar_seq_step_check,example_mmbar_seq_step_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = example_mmbar_seq_step_js_string))
+    if (any(all(!is.na(input$example_m_lower), !is.na(input$example_m_upper), input$example_m_lower > input$example_m_upper),
+            all(!is.na(input$example_m_lower), !is.na(input$example_m_upper), !is.na(input$example_m_step), input$example_m_step > input$example_m_upper - input$example_m_lower))) {
+      example_m_seq_step_check <- "Lower bound of the M sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds."
+      example_m_seq_step_js_string <- 'alert("SOMETHING");'
+      example_m_seq_step_js_string <- sub("SOMETHING",example_m_seq_step_check,example_m_seq_step_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_m_seq_step_js_string))
     }
   })
   
+  # Alert below will trigger if textinput mbar vector is wrongly formatted
+  observe({
+    if (
+      any(NA %in% (mod(as.numeric(unlist(strsplit(input$example_mbar_textinput,","))),1)!=0),
+          any(as.numeric(unlist(strsplit(input$example_mbar_textinput,",")))<0))
+    ) {
+      example_mbar_textinput_check <- "The vector of Mbar must consist of numbers being seperated by commas. Numbers must be non-negative. Please check examples in hints."
+      example_mbar_textinput_js_string <- 'alert("SOMETHING");'
+      example_mbar_textinput_js_string <- sub("SOMETHING",example_mbar_textinput_check,example_mbar_textinput_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_mbar_textinput_js_string))
+    }
+  })
+  
+  # Alert below will trigger if both textinput and sequence mbar vector are defined
+  observe({
+    if (
+      all(input$example_mbar_textinput !="",
+          any(!is.na(input$example_mbar_lower), !is.na(input$example_mbar_upper), !is.na(input$example_mbar_step)))
+    ) {
+      example_mbar_text_seq_check <- "You can enter the vector of Mbar EITHER arbitrarily OR as a sequence, but NOT both."
+      example_mbar_text_seq_js_string <- 'alert("SOMETHING");'
+      example_mbar_text_seq_js_string <- sub("SOMETHING",example_mbar_text_seq_check,example_mbar_text_seq_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_mbar_text_seq_js_string))
+    }
+  })
+  
+  # Alert below will trigger if any of lower, upper, step in the sequence mbar vector is negative 
+  observe({
+    if (any(all(!is.na(input$example_mbar_lower), input$example_mbar_lower <0),
+            all(!is.na(input$example_mbar_upper), input$example_mbar_upper <0),
+            all(!is.na(input$example_mbar_step), input$example_mbar_step <0))) {
+      example_mbar_seq_neg_check <- "Lower and upper bounds as well as step of the Mbar sequence must be non-negative."
+      example_mbar_seq_neg_js_string <- 'alert("SOMETHING");'
+      example_mbar_seq_neg_js_string <- sub("SOMETHING",example_mbar_seq_neg_check,example_mbar_seq_neg_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_mbar_seq_neg_js_string))
+    }
+  })
+  
+  # Alert below will trigger if any of lower, upper, step in the sequence mbar vector is wrongly defined
+  observe({
+    if (any(all(!is.na(input$example_mbar_lower), !is.na(input$example_mbar_upper), input$example_mbar_lower > input$example_mbar_upper),
+            all(!is.na(input$example_mbar_lower), !is.na(input$example_mbar_upper), !is.na(input$example_mbar_step), input$example_mbar_step > input$example_mbar_upper - input$example_mbar_lower))) {
+      example_mbar_seq_step_check <- "Lower bound of the Mbar sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds."
+      example_mbar_seq_step_js_string <- 'alert("SOMETHING");'
+      example_mbar_seq_step_js_string <- sub("SOMETHING",example_mbar_seq_step_check,example_mbar_seq_step_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_mbar_seq_step_js_string))
+    }
+  })
+
   # Alert below will trigger if bounds of grid used for test inversion is filled when boudning relative magnitudes is not included in base Delta
   observe({
     if (all(!("2" %in% input$example_delta), any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) {
@@ -179,15 +228,23 @@ server <- function(input, output, session) {
     #     }
     #   } 
     
-    if (any(NA %in% (mod(as.numeric(unlist(strsplit(input$example_mmbar_textinput,","))),1)!=0),any(as.numeric(unlist(strsplit(input$example_mmbar_textinput,",")))<0))) stop("The vector of M or Mbar must consist of numbers being seperated by commas. Numbers must be inon-negative. Please check examples in hints.")
-    if (all(input$example_mmbar_textinput !="", any(!is.na(input$example_mmbar_lower), !is.na(input$example_mmbar_upper), !is.na(input$example_mmbar_step)))) stop("You can enter the vector of M or Mbar EITHER arbitrarily OR as a sequence, but NOT both.")
-    if (any(all(!is.na(input$example_mmbar_lower), input$example_mmbar_lower <0),all(!is.na(input$example_mmbar_upper), input$example_mmbar_upper <0),all(!is.na(input$example_mmbar_step), input$example_mmbar_step <0))) stop("Lower and upper bounds as well as step of the M or Mbar sequence must be non-negative.")
-    if (any(all(!is.na(input$example_mmbar_lower), !is.na(input$example_mmbar_upper), input$example_mmbar_lower > input$example_mmbar_upper),all(!is.na(input$example_mmbar_lower), !is.na(input$example_mmbar_upper), !is.na(input$example_mmbar_step), input$example_mmbar_step > input$example_mmbar_upper - input$example_mmbar_lower))) stop("Lower bound of the M or Mbar sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds.")
-    if (sum(is.na(c(input$example_mmbar_lower, input$example_mmbar_upper, input$example_mmbar_step))) %in% c(1,2)) stop("If you choose to define the vector of M or Mbar by sequence, you need to fill in all blanks of Lower, Upper and Step. Otherwise, leave them all blank if you decide to define the vector arbitrarily or by default.")
-    #if (all(length(input$example_delta)==1, input$example_delta == "1", !is.na(input$example_mmbar_upper), input$example_mmbar_upper > example_sd_upper_mpre)) stop(paste("Upper bound of M vector cannot exceed ", example_sd_upper_mpre, ", which is the upper limit of M in case when smoothness restriction is the only restriction in base Delta. Please go to [ More ] > [ FAQ ] if you are interested in how to calculate this limit.", sep=""))
-    if (all(input$example_method %in% c("FLCI", "C-F"), "2" %in% input$example_delta)) stop("Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions.")
+
     if (is.null(input$example_delta)) stop("At least one base choice of Delta must be selected.")
     if (all("2" %in% input$example_delta, input$example_sign != "1", input$example_monotonicity != "1")) stop("If bounding relative magnitudes is included in base Delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions.")
+    if (all(input$example_method_rm %in% c("FLCI", "C-F"), "2" %in% input$example_delta)) stop("Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions.")
+    
+    if (any(NA %in% (mod(as.numeric(unlist(strsplit(input$example_m_textinput,","))),1)!=0),any(as.numeric(unlist(strsplit(input$example_m_textinput,",")))<0))) stop("The vector of M must consist of numbers being seperated by commas. Numbers must be inon-negative. Please check examples in hints.")
+    if (all(input$example_m_textinput !="", any(!is.na(input$example_m_lower), !is.na(input$example_m_upper), !is.na(input$example_m_step)))) stop("You can enter the vector of M EITHER arbitrarily OR as a sequence, but NOT both.")
+    if (any(all(!is.na(input$example_m_lower), input$example_m_lower <0),all(!is.na(input$example_m_upper), input$example_m_upper <0),all(!is.na(input$example_m_step), input$example_m_step <0))) stop("Lower and upper bounds as well as step of the M sequence must be non-negative.")
+    if (any(all(!is.na(input$example_m_lower), !is.na(input$example_m_upper), input$example_m_lower > input$example_m_upper),all(!is.na(input$example_m_lower), !is.na(input$example_m_upper), !is.na(input$example_m_step), input$example_m_step > input$example_m_upper - input$example_m_lower))) stop("Lower bound of the M sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds.")
+    if (sum(is.na(c(input$example_m_lower, input$example_m_upper, input$example_m_step))) %in% c(1,2)) stop("If you choose to define the vector of M by sequence, you need to fill in all blanks of Lower, Upper and Step. Otherwise, leave them all blank if you decide to define the vector by default.")
+
+    if (any(NA %in% (mod(as.numeric(unlist(strsplit(input$example_mbar_textinput,","))),1)!=0),any(as.numeric(unlist(strsplit(input$example_mbar_textinput,",")))<0))) stop("The vector of Mbar must consist of numbers being seperated by commas. Numbers must be inon-negative. Please check examples in hints.")
+    if (all(input$example_mbar_textinput !="", any(!is.na(input$example_mbar_lower), !is.na(input$example_mbar_upper), !is.na(input$example_mbar_step)))) stop("You can enter the vector of Mbar EITHER arbitrarily OR as a sequence, but NOT both.")
+    if (any(all(!is.na(input$example_mbar_lower), input$example_mbar_lower <0),all(!is.na(input$example_mbar_upper), input$example_mbar_upper <0),all(!is.na(input$example_mbar_step), input$example_mbar_step <0))) stop("Lower and upper bounds as well as step of the Mbar sequence must be non-negative.")
+    if (any(all(!is.na(input$example_mbar_lower), !is.na(input$example_mbar_upper), input$example_mbar_lower > input$example_mbar_upper),all(!is.na(input$example_mbar_lower), !is.na(input$example_mbar_upper), !is.na(input$example_mbar_step), input$example_mbar_step > input$example_mbar_upper - input$example_mbar_lower))) stop("Lower bound of the Mbar sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds.")
+    if (sum(is.na(c(input$example_mbar_lower, input$example_mbar_upper, input$example_mbar_step))) %in% c(1,2)) stop("If you choose to define the vector of Mbar by sequence, you need to fill in all blanks of Lower, Upper and Step. Otherwise, leave them all blank if you decide to define the vector by default.")
+
     if (NA %in% (mod(as.numeric(unlist(strsplit(input$example_lvec,","))),1)!=0)) stop("The vector that is used to determine parameter of interest must consist of numbers, instead of characters")
     if (any(mod(as.numeric(unlist(strsplit(input$example_lvec,","))),1)!=0)) stop("The vector that is used to determine parameter of interest must consist of integers.")
     if (any(as.numeric(unlist(strsplit(input$example_lvec,",")))<1)) stop("The vector that is used to determine parameter of interest must consist of integers that are not less than 1.")
@@ -210,14 +267,28 @@ server <- function(input, output, session) {
     
     example_sign <- if (input$example_sign=="2") "positive" else {if(input$example_sign =="3") "negative"}
     example_monotonicity <- if (input$example_monotonicity == "2") "increasing" else {if(input$example_monotonicity =="3") "decreasing"}
-    example_mmbar_vector <- if (input$example_mmbar_textinput !="") {
-      unique(as.numeric(strsplit(input$example_mmbar_textinput,",")[[1]]))
+    example_method_delta <- if ("2" %in% input$example_delta) input$example_method_rm else input$example_method_sd
+
+    example_m_vector <- if (input$example_m_textinput !="") {
+      unique(as.numeric(strsplit(input$example_m_textinput,",")[[1]]))
       } else {
-        if (all(input$example_mmbar_textinput =="", sum(is.na(c(input$example_mmbar_lower, input$example_mmbar_upper, input$example_mmbar_step)))==0)) {
-          seq(from= input$example_mmbar_lower, to= input$example_mmbar_upper, by= input$example_mmbar_step)
+        if (all(input$example_m_textinput =="", sum(is.na(c(input$example_m_lower, input$example_m_upper, input$example_m_step)))==0)) {
+          seq(from= input$example_m_lower, to= input$example_m_upper, by= input$example_m_step)
           }
-      }
+        }
     
+    example_mbar_vector <- if (input$example_mbar_textinput !="") {
+      unique(as.numeric(strsplit(input$example_mbar_textinput,",")[[1]]))
+      } else {
+        if (all(input$example_mbar_textinput =="", sum(is.na(c(input$example_mbar_lower, input$example_mbar_upper, input$example_mbar_step)))==0)) {
+          seq(from= input$example_mbar_lower, to= input$example_mbar_upper, by= input$example_mbar_step)
+        } else {
+            seq(from=0.25, to=1.25, by=0.25) # Default vector of mbar is seq(0.25,1.25,0.25)
+          }
+        }
+    
+    example_mmbar_vector <- if ("2" %in% input$example_delta) example_mbar_vector else example_m_vector
+
     # original OLS betahat
     example_originalResults <- constructOriginalCS(
       betahat = example_data$beta, 
@@ -227,7 +298,7 @@ server <- function(input, output, session) {
       l_vec = example_weight, 
       alpha = input$example_alpha
       )
-    
+
     if (all(length(input$example_delta)==1 & input$example_delta == "2")) {
       example_delta_rm_results <- createSensitivityResults_relativeMagnitudes(
         betahat = example_data$beta, 
@@ -235,7 +306,7 @@ server <- function(input, output, session) {
         numPrePeriods = length(example_data$prePeriodIndices), 
         numPostPeriods = length(example_data$postPeriodIndices), 
         bound = "deviation from parallel trends",
-        method = input$example_method, 
+        method = example_method_delta, 
         Mbarvec = example_mmbar_vector,  
         l_vec = example_weight, 
         biasDirection = example_sign, 
@@ -247,7 +318,7 @@ server <- function(input, output, session) {
         grid.ub = input$example_grid_ub 
         )  
       example_v$result<-list(data=example_data,lvec=example_lvec,delta_rm_results=example_delta_rm_results, originalResults=example_originalResults, 
-                             mmbar=example_mmbar_vector,weight=example_weight, sign=example_sign, monotonicity=example_monotonicity, paper = input$paper, alpha=input$example_alpha, method=input$example_method, delta=input$example_delta, grid_points=input$example_grid_points, grid_lb=input$example_grid_lb, grid_ub=input$example_grid_ub, parallel=as.logical(input$example_parallel)) 
+                             mmbar=example_mmbar_vector,weight=example_weight, sign=example_sign, monotonicity=example_monotonicity, paper = input$paper, alpha=input$example_alpha, method=example_method_delta, delta=input$example_delta, grid_points=input$example_grid_points, grid_lb=input$example_grid_lb, grid_ub=input$example_grid_ub, parallel=as.logical(input$example_parallel)) 
       } else {
         if (all(length(input$example_delta)==1 & input$example_delta == "1")) {
           example_delta_sd_results <- createSensitivityResults(
@@ -255,7 +326,7 @@ server <- function(input, output, session) {
             sigma = example_data$sigma, 
             numPrePeriods = length(example_data$prePeriodIndices), 
             numPostPeriods = length(example_data$postPeriodIndices), 
-            method = input$example_method, 
+            method = example_method_delta, 
             Mvec = example_mmbar_vector,  
             l_vec = example_weight, 
             monotonicityDirection = example_monotonicity, 
@@ -264,7 +335,7 @@ server <- function(input, output, session) {
             parallel = as.logical(input$example_parallel)
             ) 
           example_v$result<-list(data=example_data,lvec=example_lvec,delta_sd_results=example_delta_sd_results, originalResults=example_originalResults, 
-                                 mmbar=example_mmbar_vector, weight=example_weight, sign=example_sign, monotonicity=example_monotonicity, paper = input$paper, alpha=input$example_alpha, method=input$example_method, delta=input$example_delta, parallel=as.logical(input$example_parallel))
+                                 mmbar=example_mmbar_vector, weight=example_weight, sign=example_sign, monotonicity=example_monotonicity, paper = input$paper, alpha=input$example_alpha, method=example_method_delta, delta=input$example_delta, parallel=as.logical(input$example_parallel))
           } else {
             example_delta_rm_results <- createSensitivityResults_relativeMagnitudes(
               betahat = example_data$beta, 
@@ -272,7 +343,7 @@ server <- function(input, output, session) {
               numPrePeriods = length(example_data$prePeriodIndices), 
               numPostPeriods = length(example_data$postPeriodIndices), 
               bound = "deviation from linear trend", 
-              method = input$example_method,
+              method = example_method_delta,
               Mbarvec = example_mmbar_vector, 
               l_vec = example_weight, 
               biasDirection = example_sign, 
@@ -284,11 +355,11 @@ server <- function(input, output, session) {
               grid.ub = input$example_grid_ub 
               ) 
             example_v$result<-list(data=example_data,lvec=example_lvec,delta_rm_results=example_delta_rm_results, originalResults=example_originalResults, 
-                                   mmbar=example_mmbar_vector,weight=example_weight, sign=example_sign, monotonicity=example_monotonicity, paper = input$paper, alpha=input$example_alpha, method=input$example_method, delta=input$example_delta, grid_points=input$example_grid_points, grid_lb=input$example_grid_lb, grid_ub=input$example_grid_ub, parallel=as.logical(input$example_parallel))  
+                                   mmbar=example_mmbar_vector,weight=example_weight, sign=example_sign, monotonicity=example_monotonicity, paper = input$paper, alpha=input$example_alpha, method=example_method_delta, delta=input$example_delta, grid_points=input$example_grid_points, grid_lb=input$example_grid_lb, grid_ub=input$example_grid_ub, parallel=as.logical(input$example_parallel))  
           }
         }
     }))
-  
+
   # Observe Reset
   observeEvent(input$example_reset, {
     example_v$result <- NULL
@@ -297,11 +368,16 @@ server <- function(input, output, session) {
     reset("example_delta")
     reset("example_sign")
     reset("example_monotonicity")
-    reset("example_mmbar_note")
-    reset("example_mmbar_textinput")
-    reset("example_mmbar_lower")
-    reset("example_mmbar_upper")
-    reset("example_mmbar_step")
+    reset("example_method_sd")
+    reset("example_method_rm")
+    reset("example_m_textinput")
+    reset("example_m_lower")
+    reset("example_m_upper")
+    reset("example_m_step")
+    reset("example_mbar_textinput")
+    reset("example_mbar_lower")
+    reset("example_mbar_upper")
+    reset("example_mbar_step")
     reset("example_lvec")
     reset("example_alpha")
     reset("example_parallel")
@@ -347,18 +423,9 @@ server <- function(input, output, session) {
     paste("[", Sys.time(), example_tz, "]")
   })
   
-  # M or Mbar Note
-  output$example_mmbar_note <- renderUI({
-    if ("2" %in% input$example_delta) {
-      p("Enter a vector of Mbar to define the base Delta you select at [ Step 3 ]")
-    } else {
-      p("Enter a vector of M to define the base Delta you select at [ Step 3 ]")
-    }
-  })
-  
   # hide or show step of grid used for test inversion
   observeEvent(input$example_delta,  {
-    if("2" %in% input$example_delta){
+    if("2" %in% input$example_delta) {
       show("example_grid_hint")
       show("example_grid_note")
       show("example_grid_lb")
@@ -368,7 +435,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$example_delta,  {
-    if(!("2" %in% input$example_delta)){
+    if(!("2" %in% input$example_delta)) {
       hide("example_grid_hint")
       hide("example_grid_note")
       hide("example_grid_lb")
@@ -376,7 +443,7 @@ server <- function(input, output, session) {
       hide("example_grid_points")
     }
   })
-  
+
   # Event Study Plot
   example_betaplot <- reactive({
     if (is.null(example_v$result)) return()
@@ -458,7 +525,7 @@ server <- function(input, output, session) {
   # Sensitivity Data
   example_ssdata <- reactive({
     if (is.null(example_v$result)) return()
-    if(all(length(input$example_delta)==1 & input$example_delta == "1")) {
+    if(all(length(example_v$result$delta)==1 & example_v$result$delta == "1")) {   
       example_v$result$delta_sd_results
     } else {
       example_v$result$delta_rm_results
@@ -684,34 +751,6 @@ server <- function(input, output, session) {
   # *****************************************************************
   
   # ------------ Alerts----------------------------------------------
-  # Alert below will trigger if file uploaded is not excel
-  resetOwnDataFileUpload <- reactiveVal(FALSE)
-  output$owndata_fileupload <- renderUI({
-    resetOwnDataFileUpload() # reactive dependency
-    resetOwnDataFileUpload(FALSE)
-    fileInput("owndata_file", 
-              p("Upload your own data in xlsx format", span(a("[ Example File ]", href="https://raw.githubusercontent.com/ccfang2/HonestDiDSenAnlys/main/SenAnlysDataFormat.xlsx"))),
-              accept = ".xlsx")
-  })
-  
-  observeEvent(input$owndata_file, {
-    if(file_ext(input$owndata_file$name) != "xlsx"){
-      resetOwnDataFileUpload(TRUE)
-      showModal(modalDialog("That's not an .xlsx file"))
-    }
-  })
-  
-  # Alert below will trigger if FLCI or Conditional FLCI is chosen for any restrictions other than SD
-  observe({
-    if (all(input$owndata_method %in% c("FLCI", "C-F"), 
-            "2" %in% input$owndata_delta)) {
-      owndata_flci_check <- "Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions."
-      owndata_flci_js_string <- 'alert("SOMETHING");'
-      owndata_flci_js_string <- sub("SOMETHING",owndata_flci_check,owndata_flci_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = owndata_flci_js_string))
-    }
-  })
-  
   # Alert below will trigger if no base delta is selected
   observe({
     if (is.null(input$owndata_delta)) {
@@ -732,6 +771,34 @@ server <- function(input, output, session) {
     }
   })
   
+  # Alert below will trigger if FLCI or Conditional FLCI is chosen for any base restrictions other than single SD
+  observe({
+    if (all(input$owndata_method_rm %in% c("FLCI", "C-F"), 
+            "2" %in% input$owndata_delta)) {
+      owndata_flci_check <- "Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions."
+      owndata_flci_js_string <- 'alert("SOMETHING");'
+      owndata_flci_js_string <- sub("SOMETHING",owndata_flci_check,owndata_flci_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_flci_js_string))
+    }
+  })
+  
+  # Alert below will trigger if file uploaded is not excel
+  resetOwnDataFileUpload <- reactiveVal(FALSE)
+  output$owndata_fileupload <- renderUI({
+    resetOwnDataFileUpload() # reactive dependency
+    resetOwnDataFileUpload(FALSE)
+    fileInput("owndata_file", 
+              p("Upload your own data in xlsx format", span(a("[ Example File ]", href="https://raw.githubusercontent.com/ccfang2/HonestDiDSenAnlys/main/SenAnlysDataFormat.xlsx"))),
+              accept = ".xlsx")
+  })
+  
+  observeEvent(input$owndata_file, {
+    if(file_ext(input$owndata_file$name) != "xlsx"){
+      resetOwnDataFileUpload(TRUE)
+      showModal(modalDialog("That's not an .xlsx file"))
+    }
+  })
+  
   # Alert below will trigger if l vector is wrongly formatted
   observe({
     if (
@@ -745,56 +812,105 @@ server <- function(input, output, session) {
       session$sendCustomMessage(type='jsCode', list(value = owndata_integer_js_string))
     }
   })
-  
-  # Alert below will trigger if textinput mmbar vector is wrongly formatted
+
+  # Alert below will trigger if textinput m vector is wrongly formatted
   observe({
     if (
-      any(NA %in% (mod(as.numeric(unlist(strsplit(input$owndata_mmbar_textinput,","))),1)!=0),
-          any(as.numeric(unlist(strsplit(input$owndata_mmbar_textinput,",")))<0))
+      any(NA %in% (mod(as.numeric(unlist(strsplit(input$owndata_m_textinput,","))),1)!=0),
+          any(as.numeric(unlist(strsplit(input$owndata_m_textinput,",")))<0))
     ) {
-      owndata_mmbar_textinput_check <- "The vector of M or Mbar must consist of numbers being seperated by commas. Numbers must be non-negative. Please check examples in hints."
-      owndata_mmbar_textinput_js_string <- 'alert("SOMETHING");'
-      owndata_mmbar_textinput_js_string <- sub("SOMETHING",owndata_mmbar_textinput_check,owndata_mmbar_textinput_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = owndata_mmbar_textinput_js_string))
+      owndata_m_textinput_check <- "The vector of M must consist of numbers being seperated by commas. Numbers must be non-negative. Please check examples in hints."
+      owndata_m_textinput_js_string <- 'alert("SOMETHING");'
+      owndata_m_textinput_js_string <- sub("SOMETHING",owndata_m_textinput_check,owndata_m_textinput_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_m_textinput_js_string))
     }
   })
   
-  # Alert below will trigger if both textinput and sequence mmbar vector are defined
+  # Alert below will trigger if both textinput and sequence m vector are defined
   observe({
     if (
-      all(input$owndata_mmbar_textinput !="",
-          any(!is.na(input$owndata_mmbar_lower), !is.na(input$owndata_mmbar_upper), !is.na(input$owndata_mmbar_step)))
+      all(input$owndata_m_textinput !="",
+          any(!is.na(input$owndata_m_lower), !is.na(input$owndata_m_upper), !is.na(input$owndata_m_step)))
     ) {
-      owndata_mmbar_text_seq_check <- "You can enter the vector of M or Mbar EITHER arbitrarily OR as a sequence, but NOT both."
-      owndata_mmbar_text_seq_js_string <- 'alert("SOMETHING");'
-      owndata_mmbar_text_seq_js_string <- sub("SOMETHING",owndata_mmbar_text_seq_check,owndata_mmbar_text_seq_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = owndata_mmbar_text_seq_js_string))
+      owndata_m_text_seq_check <- "You can enter the vector of M EITHER arbitrarily OR as a sequence, but NOT both."
+      owndata_m_text_seq_js_string <- 'alert("SOMETHING");'
+      owndata_m_text_seq_js_string <- sub("SOMETHING",owndata_m_text_seq_check,owndata_m_text_seq_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_m_text_seq_js_string))
     }
   })
   
-  # Alert below will trigger if any of lower, upper, step in the sequence mmbar vector is negative 
+  # Alert below will trigger if any of lower, upper, step in the sequence m vector is negative 
   observe({
-    if (any(all(!is.na(input$owndata_mmbar_lower), input$owndata_mmbar_lower <0),
-            all(!is.na(input$owndata_mmbar_upper), input$owndata_mmbar_upper <0),
-            all(!is.na(input$owndata_mmbar_step), input$owndata_mmbar_step <0))) {
-      owndata_mmbar_seq_neg_check <- "Lower and upper bounds as well as step of the M or Mbar sequence must be non-negative."
-      owndata_mmbar_seq_neg_js_string <- 'alert("SOMETHING");'
-      owndata_mmbar_seq_neg_js_string <- sub("SOMETHING",owndata_mmbar_seq_neg_check,owndata_mmbar_seq_neg_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = owndata_mmbar_seq_neg_js_string))
+    if (any(all(!is.na(input$owndata_m_lower), input$owndata_m_lower <0),
+            all(!is.na(input$owndata_m_upper), input$owndata_m_upper <0),
+            all(!is.na(input$owndata_m_step), input$owndata_m_step <0))) {
+      owndata_m_seq_neg_check <- "Lower and upper bounds as well as step of the M sequence must be non-negative."
+      owndata_m_seq_neg_js_string <- 'alert("SOMETHING");'
+      owndata_m_seq_neg_js_string <- sub("SOMETHING",owndata_m_seq_neg_check,owndata_m_seq_neg_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_m_seq_neg_js_string))
     }
   })
   
-  # Alert below will trigger if any of lower, upper, step in the sequence mmbar vector is wrongly defined
+  # Alert below will trigger if any of lower, upper, step in the sequence m vector is wrongly defined
   observe({
-    if (any(all(!is.na(input$owndata_mmbar_lower), !is.na(input$owndata_mmbar_upper), input$owndata_mmbar_lower > input$owndata_mmbar_upper),
-            all(!is.na(input$owndata_mmbar_lower), !is.na(input$owndata_mmbar_upper), !is.na(input$owndata_mmbar_step), input$owndata_mmbar_step > input$owndata_mmbar_upper - input$owndata_mmbar_lower))) {
-      owndata_mmbar_seq_step_check <- "Lower bound of the M or Mbar sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds."
-      owndata_mmbar_seq_step_js_string <- 'alert("SOMETHING");'
-      owndata_mmbar_seq_step_js_string <- sub("SOMETHING",owndata_mmbar_seq_step_check,owndata_mmbar_seq_step_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = owndata_mmbar_seq_step_js_string))
+    if (any(all(!is.na(input$owndata_m_lower), !is.na(input$owndata_m_upper), input$owndata_m_lower > input$owndata_m_upper),
+            all(!is.na(input$owndata_m_lower), !is.na(input$owndata_m_upper), !is.na(input$owndata_m_step), input$owndata_m_step > input$owndata_m_upper - input$owndata_m_lower))) {
+      owndata_m_seq_step_check <- "Lower bound of the M sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds."
+      owndata_m_seq_step_js_string <- 'alert("SOMETHING");'
+      owndata_m_seq_step_js_string <- sub("SOMETHING",owndata_m_seq_step_check,owndata_m_seq_step_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_m_seq_step_js_string))
     }
   })
   
+  # Alert below will trigger if textinput mbar vector is wrongly formatted
+  observe({
+    if (
+      any(NA %in% (mod(as.numeric(unlist(strsplit(input$owndata_mbar_textinput,","))),1)!=0),
+          any(as.numeric(unlist(strsplit(input$owndata_mbar_textinput,",")))<0))
+    ) {
+      owndata_mbar_textinput_check <- "The vector of Mbar must consist of numbers being seperated by commas. Numbers must be non-negative. Please check examples in hints."
+      owndata_mbar_textinput_js_string <- 'alert("SOMETHING");'
+      owndata_mbar_textinput_js_string <- sub("SOMETHING",owndata_mbar_textinput_check,owndata_mbar_textinput_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_mbar_textinput_js_string))
+    }
+  })
+  
+  # Alert below will trigger if both textinput and sequence mbar vector are defined
+  observe({
+    if (
+      all(input$owndata_mbar_textinput !="",
+          any(!is.na(input$owndata_mbar_lower), !is.na(input$owndata_mbar_upper), !is.na(input$owndata_mbar_step)))
+    ) {
+      owndata_mbar_text_seq_check <- "You can enter the vector of Mbar EITHER arbitrarily OR as a sequence, but NOT both."
+      owndata_mbar_text_seq_js_string <- 'alert("SOMETHING");'
+      owndata_mbar_text_seq_js_string <- sub("SOMETHING",owndata_mbar_text_seq_check,owndata_mbar_text_seq_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_mbar_text_seq_js_string))
+    }
+  })
+  
+  # Alert below will trigger if any of lower, upper, step in the sequence mbar vector is negative 
+  observe({
+    if (any(all(!is.na(input$owndata_mbar_lower), input$owndata_mbar_lower <0),
+            all(!is.na(input$owndata_mbar_upper), input$owndata_mbar_upper <0),
+            all(!is.na(input$owndata_mbar_step), input$owndata_mbar_step <0))) {
+      owndata_mbar_seq_neg_check <- "Lower and upper bounds as well as step of the Mbar sequence must be non-negative."
+      owndata_mbar_seq_neg_js_string <- 'alert("SOMETHING");'
+      owndata_mbar_seq_neg_js_string <- sub("SOMETHING",owndata_mbar_seq_neg_check,owndata_mbar_seq_neg_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_mbar_seq_neg_js_string))
+    }
+  })
+  
+  # Alert below will trigger if any of lower, upper, step in the sequence mbar vector is wrongly defined
+  observe({
+    if (any(all(!is.na(input$owndata_mbar_lower), !is.na(input$owndata_mbar_upper), input$owndata_mbar_lower > input$owndata_mbar_upper),
+            all(!is.na(input$owndata_mbar_lower), !is.na(input$owndata_mbar_upper), !is.na(input$owndata_mbar_step), input$owndata_mbar_step > input$owndata_mbar_upper - input$owndata_mbar_lower))) {
+      owndata_mbar_seq_step_check <- "Lower bound of the Mbar sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds."
+      owndata_mbar_seq_step_js_string <- 'alert("SOMETHING");'
+      owndata_mbar_seq_step_js_string <- sub("SOMETHING",owndata_mbar_seq_step_check,owndata_mbar_seq_step_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_mbar_seq_step_js_string))
+    }
+  })
+
   # Alert below will trigger if bounds of grid used for test inversion is filled when boudning relative magnitudes is not included in base Delta
   observe({
     if (all(!("2" %in% input$owndata_delta), any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) {
@@ -848,7 +964,6 @@ server <- function(input, output, session) {
                       lapply(read_data()[c("beta", "tVec", "referencePeriod", "prePeriodIndices", "postPeriodIndices")], unlist))
     
     # Report Errors
-    
     # owndata_sd_upper_mpre <- if (all(length(input$owndata_delta)==1, input$owndata_delta == "1", length(owndata_data$prePeriodIndices) > 1)) {
     #   DeltaSD_upperBound_Mpre(betahat = owndata_data$beta,
     #                           sigma = owndata_data$sigma,
@@ -860,16 +975,23 @@ server <- function(input, output, session) {
     #                             owndata_data$prePeriodIndices[length(owndata_data$prePeriodIndices)]])
     #   }
     # } 
-    
-    if (any(NA %in% (mod(as.numeric(unlist(strsplit(input$owndata_mmbar_textinput,","))),1)!=0),any(as.numeric(unlist(strsplit(input$owndata_mmbar_textinput,",")))<0))) stop("The vector of M or Mbar must consist of numbers being seperated by commas. Numbers must be inon-negative. Please check examples in hints.")
-    if (all(input$owndata_mmbar_textinput !="", any(!is.na(input$owndata_mmbar_lower), !is.na(input$owndata_mmbar_upper), !is.na(input$owndata_mmbar_step)))) stop("You can enter the vector of M or Mbar EITHER arbitrarily OR as a sequence, but NOT both.")
-    if (any(all(!is.na(input$owndata_mmbar_lower), input$owndata_mmbar_lower <0),all(!is.na(input$owndata_mmbar_upper), input$owndata_mmbar_upper <0),all(!is.na(input$owndata_mmbar_step), input$owndata_mmbar_step <0))) stop("Lower and upper bounds as well as step of the M or Mbar sequence must be non-negative.")
-    if (any(all(!is.na(input$owndata_mmbar_lower), !is.na(input$owndata_mmbar_upper), input$owndata_mmbar_lower > input$owndata_mmbar_upper),all(!is.na(input$owndata_mmbar_lower), !is.na(input$owndata_mmbar_upper), !is.na(input$owndata_mmbar_step), input$owndata_mmbar_step > input$owndata_mmbar_upper - input$owndata_mmbar_lower))) stop("Lower bound of the M or Mbar sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds.")
-    if (sum(is.na(c(input$owndata_mmbar_lower, input$owndata_mmbar_upper, input$owndata_mmbar_step))) %in% c(1,2)) stop("If you choose to define the vector of M or Mbar by sequence, you need to fill in all blanks of Lower, Upper and Step. Otherwise, leave them all blank if you decide to define the vector arbitrarily or by default.")
-    #if (all(length(input$owndata_delta)==1, input$owndata_delta == "1", !is.na(input$owndata_mmbar_upper), input$owndata_mmbar_upper > owndata_sd_upper_mpre)) stop(paste("Upper bound of M vector cannot exceed ", owndata_sd_upper_mpre, ", which is the upper limit of M in case when smoothness restriction is the only restriction in base Delta. Please go to [ More ] > [ FAQ ] if you are interested in how to calculate this limit.", sep=""))
-    if (all(input$owndata_method %in% c("FLCI", "C-F"), "2" %in% input$owndata_delta)) stop("Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions.")
+
     if (is.null(input$owndata_delta)) stop("At least one base choice of Delta must be selected.")
     if (all("2" %in% input$owndata_delta, input$owndata_sign != "1", input$owndata_monotonicity != "1")) stop("If bounding relative magnitudes is included in base Delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions.")
+    if (all(input$owndata_method_rm %in% c("FLCI", "C-F"), "2" %in% input$owndata_delta)) stop("Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions.")
+
+    if (any(NA %in% (mod(as.numeric(unlist(strsplit(input$owndata_m_textinput,","))),1)!=0),any(as.numeric(unlist(strsplit(input$owndata_m_textinput,",")))<0))) stop("The vector of M must consist of numbers being seperated by commas. Numbers must be inon-negative. Please check examples in hints.")
+    if (all(input$owndata_m_textinput !="", any(!is.na(input$owndata_m_lower), !is.na(input$owndata_m_upper), !is.na(input$owndata_m_step)))) stop("You can enter the vector of M EITHER arbitrarily OR as a sequence, but NOT both.")
+    if (any(all(!is.na(input$owndata_m_lower), input$owndata_m_lower <0),all(!is.na(input$owndata_m_upper), input$owndata_m_upper <0),all(!is.na(input$owndata_m_step), input$owndata_m_step <0))) stop("Lower and upper bounds as well as step of the M sequence must be non-negative.")
+    if (any(all(!is.na(input$owndata_m_lower), !is.na(input$owndata_m_upper), input$owndata_m_lower > input$owndata_m_upper),all(!is.na(input$owndata_m_lower), !is.na(input$owndata_m_upper), !is.na(input$owndata_m_step), input$owndata_m_step > input$owndata_m_upper - input$owndata_m_lower))) stop("Lower bound of the M sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds.")
+    if (sum(is.na(c(input$owndata_m_lower, input$owndata_m_upper, input$owndata_m_step))) %in% c(1,2)) stop("If you choose to define the vector of M by sequence, you need to fill in all blanks of Lower, Upper and Step. Otherwise, leave them all blank if you decide to define the vector by default.")
+    
+    if (any(NA %in% (mod(as.numeric(unlist(strsplit(input$owndata_mbar_textinput,","))),1)!=0),any(as.numeric(unlist(strsplit(input$owndata_mbar_textinput,",")))<0))) stop("The vector of Mbar must consist of numbers being seperated by commas. Numbers must be inon-negative. Please check examples in hints.")
+    if (all(input$owndata_mbar_textinput !="", any(!is.na(input$owndata_mbar_lower), !is.na(input$owndata_mbar_upper), !is.na(input$owndata_mbar_step)))) stop("You can enter the vector of Mbar EITHER arbitrarily OR as a sequence, but NOT both.")
+    if (any(all(!is.na(input$owndata_mbar_lower), input$owndata_mbar_lower <0),all(!is.na(input$owndata_mbar_upper), input$owndata_mbar_upper <0),all(!is.na(input$owndata_mbar_step), input$owndata_mbar_step <0))) stop("Lower and upper bounds as well as step of the Mbar sequence must be non-negative.")
+    if (any(all(!is.na(input$owndata_mbar_lower), !is.na(input$owndata_mbar_upper), input$owndata_mbar_lower > input$owndata_mbar_upper),all(!is.na(input$owndata_mbar_lower), !is.na(input$owndata_mbar_upper), !is.na(input$owndata_mbar_step), input$owndata_mbar_step > input$owndata_mbar_upper - input$owndata_mbar_lower))) stop("Lower bound of the Mbar sequence shouldn't be larger than upper bound, and step of the sequence shouldn't be larger than the difference between lower and upper bounds.")
+    if (sum(is.na(c(input$owndata_mbar_lower, input$owndata_mbar_upper, input$owndata_mbar_step))) %in% c(1,2)) stop("If you choose to define the vector of Mbar by sequence, you need to fill in all blanks of Lower, Upper and Step. Otherwise, leave them all blank if you decide to define the vector by default.")
+
     if (NA %in% (mod(as.numeric(unlist(strsplit(input$owndata_lvec,","))),1)!=0)) stop("The vector that is used to determine parameter of interest must consist of numbers, instead of characters")
     if (any(mod(as.numeric(unlist(strsplit(input$owndata_lvec,","))),1)!=0)) stop("The vector that is used to determine parameter of interest must consist of integers.")
     if (any(as.numeric(unlist(strsplit(input$owndata_lvec,",")))<1)) stop("The vector that is used to determine parameter of interest must consist of integers that are not less than 1.")
@@ -892,13 +1014,27 @@ server <- function(input, output, session) {
     
     owndata_sign <- if (input$owndata_sign=="2") "positive" else {if(input$owndata_sign =="3") "negative"}
     owndata_monotonicity <- if (input$owndata_monotonicity == "2") "increasing" else {if(input$owndata_monotonicity =="3") "decreasing"}
-    owndata_mmbar_vector <- if (input$owndata_mmbar_textinput !="") {
-      unique(as.numeric(strsplit(input$owndata_mmbar_textinput,",")[[1]]))
+    owndata_method_delta <- if ("2" %in% input$owndata_delta) input$owndata_method_rm else input$owndata_method_sd
+    
+    owndata_m_vector <- if (input$owndata_m_textinput !="") {
+      unique(as.numeric(strsplit(input$owndata_m_textinput,",")[[1]]))
     } else {
-      if (all(input$owndata_mmbar_textinput =="", sum(is.na(c(input$owndata_mmbar_lower, input$owndata_mmbar_upper, input$owndata_mmbar_step)))==0)) {
-        seq(from= input$owndata_mmbar_lower, to= input$owndata_mmbar_upper, by= input$owndata_mmbar_step)
+      if (all(input$owndata_m_textinput =="", sum(is.na(c(input$owndata_m_lower, input$owndata_m_upper, input$owndata_m_step)))==0)) {
+        seq(from= input$owndata_m_lower, to= input$owndata_m_upper, by= input$owndata_m_step)
       }
     }
+    
+    owndata_mbar_vector <- if (input$owndata_mbar_textinput !="") {
+      unique(as.numeric(strsplit(input$owndata_mbar_textinput,",")[[1]]))
+    } else {
+      if (all(input$owndata_mbar_textinput =="", sum(is.na(c(input$owndata_mbar_lower, input$owndata_mbar_upper, input$owndata_mbar_step)))==0)) {
+        seq(from= input$owndata_mbar_lower, to= input$owndata_mbar_upper, by= input$owndata_mbar_step)
+      } else {
+        seq(from=0.25, to=1.25, by=0.25)  # Default vector of mbar is seq(0.25,1.25,0.25)
+      }
+    }
+    
+    owndata_mmbar_vector <- if ("2" %in% input$owndata_delta) owndata_mbar_vector else owndata_m_vector
     
     # original OLS betahat
     owndata_originalResults <- constructOriginalCS(
@@ -917,7 +1053,7 @@ server <- function(input, output, session) {
         numPrePeriods = length(owndata_data$prePeriodIndices), 
         numPostPeriods = length(owndata_data$postPeriodIndices), 
         bound = "deviation from parallel trends",
-        method = input$owndata_method, 
+        method = owndata_method_delta, 
         Mbarvec = owndata_mmbar_vector,  
         l_vec = owndata_weight, 
         biasDirection = owndata_sign, 
@@ -929,7 +1065,7 @@ server <- function(input, output, session) {
         grid.ub = input$owndata_grid_ub 
       )
       owndata_v$result<-list(data=owndata_data,lvec=owndata_lvec,delta_rm_results=owndata_delta_rm_results, originalResults=owndata_originalResults, 
-                             mmbar=owndata_mmbar_vector, weight=owndata_weight, sign=owndata_sign, monotonicity=owndata_monotonicity, alpha=input$owndata_alpha, method=input$owndata_method, delta=input$owndata_delta, name=input$owndata_file$name, grid_points=input$owndata_grid_points, grid_lb=input$owndata_grid_lb, grid_ub=input$owndata_grid_ub, parallel=as.logical(input$owndata_parallel))
+                             mmbar=owndata_mmbar_vector, weight=owndata_weight, sign=owndata_sign, monotonicity=owndata_monotonicity, alpha=input$owndata_alpha, method=owndata_method_delta, delta=input$owndata_delta, name=input$owndata_file$name, grid_points=input$owndata_grid_points, grid_lb=input$owndata_grid_lb, grid_ub=input$owndata_grid_ub, parallel=as.logical(input$owndata_parallel))
     } else {
       if (all(length(input$owndata_delta)==1 & input$owndata_delta == "1")) {
         owndata_delta_sd_results <- createSensitivityResults(
@@ -937,7 +1073,7 @@ server <- function(input, output, session) {
           sigma = owndata_data$sigma, 
           numPrePeriods = length(owndata_data$prePeriodIndices), 
           numPostPeriods = length(owndata_data$postPeriodIndices), 
-          method = input$owndata_method, 
+          method = owndata_method_delta, 
           Mvec = owndata_mmbar_vector,  
           l_vec = owndata_weight, 
           monotonicityDirection = owndata_monotonicity, 
@@ -946,7 +1082,7 @@ server <- function(input, output, session) {
           parallel = as.logical(input$owndata_parallel)
         )
         owndata_v$result<-list(data=owndata_data,lvec=owndata_lvec,delta_sd_results=owndata_delta_sd_results, originalResults=owndata_originalResults, 
-                               mmbar=owndata_mmbar_vector, weight=owndata_weight, sign=owndata_sign, monotonicity=owndata_monotonicity, alpha=input$owndata_alpha, method=input$owndata_method, delta=input$owndata_delta, name=input$owndata_file$name, parallel=as.logical(input$owndata_parallel))
+                               mmbar=owndata_mmbar_vector, weight=owndata_weight, sign=owndata_sign, monotonicity=owndata_monotonicity, alpha=input$owndata_alpha, method=owndata_method_delta, delta=input$owndata_delta, name=input$owndata_file$name, parallel=as.logical(input$owndata_parallel))
       } else {
         owndata_delta_rm_results <- createSensitivityResults_relativeMagnitudes(
           betahat = owndata_data$beta, 
@@ -954,7 +1090,7 @@ server <- function(input, output, session) {
           numPrePeriods = length(owndata_data$prePeriodIndices), 
           numPostPeriods = length(owndata_data$postPeriodIndices), 
           bound = "deviation from linear trend", 
-          method = input$owndata_method,
+          method = owndata_method_delta,
           Mbarvec = owndata_mmbar_vector,  
           l_vec = owndata_weight, 
           biasDirection = owndata_sign, 
@@ -966,7 +1102,7 @@ server <- function(input, output, session) {
           grid.ub = input$owndata_grid_ub 
         )
         owndata_v$result<-list(data=owndata_data,lvec=owndata_lvec,delta_rm_results=owndata_delta_rm_results, originalResults=owndata_originalResults, 
-                               mmbar=owndata_mmbar_vector, weight=owndata_weight, sign=owndata_sign, monotonicity=owndata_monotonicity, alpha=input$owndata_alpha, method=input$owndata_method, delta=input$owndata_delta, name=input$owndata_file$name, grid_points=input$owndata_grid_points, grid_lb=input$owndata_grid_lb, grid_ub=input$owndata_grid_ub, parallel=as.logical(input$owndata_parallel))
+                               mmbar=owndata_mmbar_vector, weight=owndata_weight, sign=owndata_sign, monotonicity=owndata_monotonicity, alpha=input$owndata_alpha, method=owndata_method_delta, delta=input$owndata_delta, name=input$owndata_file$name, grid_points=input$owndata_grid_points, grid_lb=input$owndata_grid_lb, grid_ub=input$owndata_grid_ub, parallel=as.logical(input$owndata_parallel))
       }
     }
   }))
@@ -979,11 +1115,16 @@ server <- function(input, output, session) {
     reset("owndata_delta")
     reset("owndata_sign")
     reset("owndata_monotonicity")
-    reset("owndata_mmbar_note")
-    reset("owndata_mmbar_textinput")
-    reset("owndata_mmbar_lower")
-    reset("owndata_mmbar_upper")
-    reset("owndata_mmbar_step")
+    reset("owndata_method_sd")
+    reset("owndata_method_rm")
+    reset("owndata_m_textinput")
+    reset("owndata_m_lower")
+    reset("owndata_m_upper")
+    reset("owndata_m_step")
+    reset("owndata_mbar_textinput")
+    reset("owndata_mbar_lower")
+    reset("owndata_mbar_upper")
+    reset("owndata_mbar_step")
     reset("owndata_lvec")
     reset("owndata_alpha")
     reset("owndata_parallel")
@@ -1027,20 +1168,8 @@ server <- function(input, output, session) {
     owndata_tz <- if (class(owndata_tz)!="character") "UTC" else owndata_tz
     #paste("[", lubridate::with_tz(Sys.time(), owndata_tz),"]")
     paste("[", Sys.time(),owndata_tz, "]")
-    
+  })
 
-    
-  })
-  
-  # M or Mbar Note
-  output$owndata_mmbar_note <- renderUI({
-    if ("2" %in% input$owndata_delta) {
-      p("Enter a vector of Mbar to define the base Delta you select at [ Step 3 ]")
-    } else {
-      p("Enter a vector of M to define the base Delta you select at [ Step 3 ]")
-    }
-  })
-  
   # Hide or show step of grid used for test inversion
   observeEvent(input$owndata_delta,  {
     if("2" %in% input$owndata_delta){
@@ -1143,7 +1272,7 @@ server <- function(input, output, session) {
   # Sensitivity Data
   owndata_ssdata <- reactive({
     if (is.null(owndata_v$result)) return()
-    if(all(length(input$owndata_delta)==1 & input$owndata_delta == "1")) {
+    if(all(length(owndata_v$result$delta)==1 & owndata_v$result$delta == "1")) {   
       owndata_v$result$delta_sd_results
     } else {
       owndata_v$result$delta_rm_results
