@@ -17,13 +17,12 @@ library(shiny)
 shiny::runGitHub("HonestDiDSenAnlys", "ccfang2")
 ```
 
-2. Alternatively, you can access the online version of this shiny app [here](https://ccfang2.shinyapps.io/HonestDiDSenAnlys/). Unfortunately, total usage duration could not be more than 25 hours per month as I use free versions of shiny apps.
+2. Alternatively, you can access the online version of this shiny app [here](https://ccfang2.shinyapps.io/HonestDiDSenAnlys/). Unfortunately, total usage duration could not be more than 25 hours per month as I use free versions of shiny apps. The link of online app can also be found on the HonestDiD [R](https://github.com/asheshrambachan/HonestDiD) and [Stata](https://github.com/mcaceresb/stata-honestdid#honestdid) pages.
 
 ## About this app
 
 ### Screenshot
-<img width="1376" alt="Screen Shot" src="https://user-images.githubusercontent.com/100428466/202984247-dab10d33-d6c1-4efd-a7df-e80de1a41f40.png">
-
+<img width="1400" alt="Screen Shot" src="https://user-images.githubusercontent.com/100428466/204014024-f7d90467-bf91-465c-918f-470ae407431b.png">
 
 ### What does this app do for you
 1. Sensitivity analysis for example papers discussed in [Rambachan and Roth (2022)](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf)
@@ -37,7 +36,7 @@ shiny::runGitHub("HonestDiDSenAnlys", "ccfang2")
 3. Analysis results and plots are downloadable by a simple click of buttons. But, please be reminded that only the latest analysis results and plots are accessible, so download them timely if needed.
 
 ### Instructions
-Please watch this Youtube [video](https://www.youtube.com/watch?v=PyY-2ptiLTU) for detailed instruction. This video is also embeded in this Shiny app.
+Please watch this Youtube [video](https://www.youtube.com/watch?v=PyY-2ptiLTU) for detailed instruction. This video is also embeded in this Shiny app. Please be aware that the layout of Shiny app shown in this video may be slightly different from the latest version of app.
 
 ## Contact
 I hope you enjoy using this app. Any comments or questions are welcome at [ccfang[at]uni-bonn.de](mailto:ccfang@uni-bonn.de).
