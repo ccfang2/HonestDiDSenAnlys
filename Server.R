@@ -33,19 +33,9 @@ server <- function(input, output, session) {
   # *****************************************************************
   
   # ------------ Alerts----------------------------------------------
-  # Alert below will trigger if no base delta is selected
-  observe({
-    if (is.null(input$example_delta)) {
-      example_base_delta_check <- "At least one base choice of Delta must be selected."
-      example_base_delta_js_string <- 'alert("SOMETHING");'
-      example_base_delta_js_string <- sub("SOMETHING",example_base_delta_check,example_base_delta_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = example_base_delta_js_string))
-    }
-  })
-  
   # Alert below will trigger if both optional restrictions are selected when Bounding Relative Magnitudes is included in base Delta
   observe({
-    if (all("2" %in% input$example_delta, input$example_sign != "1", input$example_monotonicity != "1")) {
+    if (all(input$example_delta !="2", input$example_sign != "1", input$example_monotonicity != "1")) {
       example_optional_delta_check <- "If bounding relative magnitudes is included in base Delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions."
       example_optional_delta_js_string <- 'alert("SOMETHING");'
       example_optional_delta_js_string <- sub("SOMETHING",example_optional_delta_check,example_optional_delta_js_string)
@@ -56,7 +46,7 @@ server <- function(input, output, session) {
   # Alert below will trigger if FLCI or Conditional FLCI is chosen for any base restrictions other than single SD
   observe({
     if (all(input$example_method_rm %in% c("FLCI", "C-F"), 
-            "2" %in% input$example_delta)) {
+            input$example_delta != "2")) {
       example_flci_check <- "Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions."
       example_flci_js_string <- 'alert("SOMETHING");'
       example_flci_js_string <- sub("SOMETHING",example_flci_check,example_flci_js_string)
@@ -178,8 +168,8 @@ server <- function(input, output, session) {
 
   # Alert below will trigger if bounds of grid used for test inversion is filled when boudning relative magnitudes is not included in base Delta
   observe({
-    if (all(!("2" %in% input$example_delta), any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) {
-      example_grid_bound_check <- "Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 8 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid."
+    if (all(input$example_delta == "2", any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) {
+      example_grid_bound_check <- "Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid."
       example_grid_bound_js_string <- 'alert("SOMETHING");'
       example_grid_bound_js_string <- sub("SOMETHING",example_grid_bound_check,example_grid_bound_js_string)
       session$sendCustomMessage(type='jsCode', list(value = example_grid_bound_js_string))
@@ -228,10 +218,8 @@ server <- function(input, output, session) {
     #     }
     #   } 
     
-
-    if (is.null(input$example_delta)) stop("At least one base choice of Delta must be selected.")
-    if (all("2" %in% input$example_delta, input$example_sign != "1", input$example_monotonicity != "1")) stop("If bounding relative magnitudes is included in base Delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions.")
-    if (all(input$example_method_rm %in% c("FLCI", "C-F"), "2" %in% input$example_delta)) stop("Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions.")
+    if (all(input$example_delta != "2", input$example_sign != "1", input$example_monotonicity != "1")) stop("If bounding relative magnitudes is included in base Delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions.")
+    if (all(input$example_method_rm %in% c("FLCI", "C-F"), input$example_delta != "2")) stop("Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions.")
     
     if (any(NA %in% (mod(as.numeric(unlist(strsplit(input$example_m_textinput,","))),1)!=0),any(as.numeric(unlist(strsplit(input$example_m_textinput,",")))<0))) stop("The vector of M must consist of numbers being seperated by commas. Numbers must be inon-negative. Please check examples in hints.")
     if (all(input$example_m_textinput !="", any(!is.na(input$example_m_lower), !is.na(input$example_m_upper), !is.na(input$example_m_step)))) stop("You can enter the vector of M EITHER arbitrarily OR as a sequence, but NOT both.")
@@ -249,7 +237,7 @@ server <- function(input, output, session) {
     if (any(mod(as.numeric(unlist(strsplit(input$example_lvec,","))),1)!=0)) stop("The vector that is used to determine parameter of interest must consist of integers.")
     if (any(as.numeric(unlist(strsplit(input$example_lvec,",")))<1)) stop("The vector that is used to determine parameter of interest must consist of integers that are not less than 1.")
     if (max(as.numeric(unlist(strsplit(input$example_lvec,","))))>length(example_data$postPeriodIndices)) stop("Numbers in the vector that is used to determine parameter of interest shouldn't be larger than the total length of post treatment periods.")
-    if (all(!("2" %in% input$example_delta), any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) stop("Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 8 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid.")
+    if (all(input$example_delta == "2", any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) stop("Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid.")
     if (any(all(!is.na(input$example_grid_lb), input$example_grid_lb>0), all(!is.na(input$example_grid_ub), input$example_grid_ub<0))) stop("Lower bound of grid used for underlying test inversion should be non-positive, and upper bound should be non-negative.")
     if (is.na(input$example_grid_points)) stop("Number of grid points shouldn't be empty.")
     if (all(!is.na(input$example_grid_points),any(mod(input$example_grid_points,1)!=0,input$example_grid_points < 1))) stop("Number of grid points should be positive integer.")
@@ -267,7 +255,7 @@ server <- function(input, output, session) {
     
     example_sign <- if (input$example_sign=="2") "positive" else {if(input$example_sign =="3") "negative"}
     example_monotonicity <- if (input$example_monotonicity == "2") "increasing" else {if(input$example_monotonicity =="3") "decreasing"}
-    example_method_delta <- if ("2" %in% input$example_delta) input$example_method_rm else input$example_method_sd
+    example_method_delta <- if (input$example_delta != "2") input$example_method_rm else input$example_method_sd
 
     example_m_vector <- if (input$example_m_textinput !="") {
       unique(as.numeric(strsplit(input$example_m_textinput,",")[[1]]))
@@ -287,7 +275,7 @@ server <- function(input, output, session) {
           }
         }
     
-    example_mmbar_vector <- if ("2" %in% input$example_delta) example_mbar_vector else example_m_vector
+    example_mmbar_vector <- if (input$example_delta != "2") example_mbar_vector else example_m_vector
 
     # original OLS betahat
     example_originalResults <- constructOriginalCS(
@@ -299,7 +287,7 @@ server <- function(input, output, session) {
       alpha = input$example_alpha
       )
 
-    if (all(length(input$example_delta)==1 & input$example_delta == "2")) {
+    if (input$example_delta == "1") {
       example_delta_rm_results <- createSensitivityResults_relativeMagnitudes(
         betahat = example_data$beta, 
         sigma = example_data$sigma, 
@@ -320,7 +308,7 @@ server <- function(input, output, session) {
       example_v$result<-list(data=example_data,lvec=example_lvec,delta_rm_results=example_delta_rm_results, originalResults=example_originalResults, 
                              mmbar=example_mmbar_vector,weight=example_weight, sign=example_sign, monotonicity=example_monotonicity, paper = input$paper, alpha=input$example_alpha, method=example_method_delta, delta=input$example_delta, grid_points=input$example_grid_points, grid_lb=input$example_grid_lb, grid_ub=input$example_grid_ub, parallel=as.logical(input$example_parallel)) 
       } else {
-        if (all(length(input$example_delta)==1 & input$example_delta == "1")) {
+        if (input$example_delta == "2") {
           example_delta_sd_results <- createSensitivityResults(
             betahat = example_data$beta, 
             sigma = example_data$sigma, 
@@ -394,7 +382,7 @@ server <- function(input, output, session) {
   # ------------ Outputs -----------------------------
   # Alert below will trigger if lower bounds of confidence sets are exactly the same for different Mbar
   observe({
-    if (all("2" %in% example_v$result$delta,
+    if (all(example_v$result$delta != "2",
             any(duplicated(example_v$result$delta_rm_results$lb)))) {
       example_grid_lb_error_check <- "WARNING: It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to decrease it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
       example_grid_lb_error_js_string <- 'alert("SOMETHING");'
@@ -405,7 +393,7 @@ server <- function(input, output, session) {
   
   # Alert below will trigger if upper bounds of confidence sets are exactly the same for different Mbar
   observe({
-    if (all("2" %in% example_v$result$delta,
+    if (all(example_v$result$delta != "2",
             any(duplicated(example_v$result$delta_rm_results$ub)))) {
       example_grid_ub_error_check <- "WARNING: It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to increase it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
       example_grid_ub_error_js_string <- 'alert("SOMETHING");'
@@ -425,7 +413,7 @@ server <- function(input, output, session) {
   
   # hide or show step of grid used for test inversion
   observeEvent(input$example_delta,  {
-    if("2" %in% input$example_delta) {
+    if(input$example_delta != "2") {
       show("example_grid_hint")
       show("example_grid_note")
       show("example_grid_lb")
@@ -435,7 +423,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$example_delta,  {
-    if(!("2" %in% input$example_delta)) {
+    if(input$example_delta == "2") {
       hide("example_grid_hint")
       hide("example_grid_note")
       hide("example_grid_lb")
@@ -467,7 +455,7 @@ server <- function(input, output, session) {
   example_ssplot <- reactive({
     if (is.null(example_v$result)) return()
     
-    plot <-  if(all(length(example_v$result$delta)==1 & example_v$result$delta == "1")) {
+    plot <-  if(example_v$result$delta == "2") {
       createSensitivityPlot(example_v$result$delta_sd_results, example_v$result$originalResults)
       } else {
         createSensitivityPlot_relativeMagnitudes(example_v$result$delta_rm_results, example_v$result$originalResults)
@@ -508,13 +496,13 @@ server <- function(input, output, session) {
   output$example_grid_warning <- renderText({
     input$example_start
     if (is.null(example_v$result)) return()
-    example_gridwarning <- if (all("2" %in% example_v$result$delta, any(duplicated(example_v$result$delta_rm_results$lb)))) {
+    example_gridwarning <- if (all(example_v$result$delta != "2", any(duplicated(example_v$result$delta_rm_results$lb)))) {
       "\n It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to decrease it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
     } else {
-      if ((all("2" %in% example_v$result$delta, any(duplicated(example_v$result$delta_rm_results$ub))))) {
+      if ((all(example_v$result$delta != "2", any(duplicated(example_v$result$delta_rm_results$ub))))) {
         "\n It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to increase it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
       } else {
-        if (all("2" %in% example_v$result$delta, any(duplicated(example_v$result$delta_rm_results$lb)), any(duplicated(example_v$result$delta_rm_results$ub)))) {
+        if (all(example_v$result$delta != "2", any(duplicated(example_v$result$delta_rm_results$lb)), any(duplicated(example_v$result$delta_rm_results$ub)))) {
           "\n It is detected that the bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small). You need to decrease (increase) it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how bounds of grid used for test inversion is defined by default."
         } else {NULL}
       }
@@ -525,7 +513,7 @@ server <- function(input, output, session) {
   # Sensitivity Data
   example_ssdata <- reactive({
     if (is.null(example_v$result)) return()
-    if(all(length(example_v$result$delta)==1 & example_v$result$delta == "1")) {   
+    if(example_v$result$delta == "2") {   
       example_v$result$delta_sd_results
     } else {
       example_v$result$delta_rm_results
@@ -621,7 +609,7 @@ server <- function(input, output, session) {
                     "\40 \40 alpha = ",example_v$result$alpha, "\n",
                     ") \n \n")
     
-    sensitivityAnalysis <- if (all(length(example_v$result$delta)==1 & example_v$result$delta == "2")) {
+    sensitivityAnalysis <- if (example_v$result$delta == "1") {
       c("# Create Sensitivity Result \n",
         "delta_rm_results <- createSensitivityResults_relativeMagnitudes( \n",
         "\40 \40 betahat = data$beta, \n",
@@ -641,7 +629,7 @@ server <- function(input, output, session) {
         "\40 \40 grid.ub = ",example_v$result$grid_ub,"\n",  
         ") \n \n")
       } else {
-        if (all(length(example_v$result$delta)==1 & example_v$result$delta == "1")) {
+        if (example_v$result$delta == "2") {
           c("# Create Sensitivity Result \n",
             "delta_sd_results <- createSensitivityResults( \n",
             "\40 \40 betahat = data$beta, \n",
@@ -678,7 +666,7 @@ server <- function(input, output, session) {
         }
       }
         
-    plot <- if(all(length(example_v$result$delta)==1 & example_v$result$delta == "1")) {
+    plot <- if(example_v$result$delta == "2") {
       c("# Create Sensitivity Plot \n",
         "sensitivity_plot <- createSensitivityPlot(delta_sd_results, originalResults) \n",
         "sensitivity_plot \n \n")
@@ -751,19 +739,9 @@ server <- function(input, output, session) {
   # *****************************************************************
   
   # ------------ Alerts----------------------------------------------
-  # Alert below will trigger if no base delta is selected
-  observe({
-    if (is.null(input$owndata_delta)) {
-      owndata_base_delta_check <- "At least one base choice of Delta must be selected."
-      owndata_base_delta_js_string <- 'alert("SOMETHING");'
-      owndata_base_delta_js_string <- sub("SOMETHING",owndata_base_delta_check,owndata_base_delta_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = owndata_base_delta_js_string))
-    }
-  })
-  
   # Alert below will trigger if both optional restrictions are selected when Bounding Relative Magnitudes is included in base Delta
   observe({
-    if (all("2" %in% input$owndata_delta, input$owndata_sign != "1", input$owndata_monotonicity != "1")) {
+    if (all(input$owndata_delta != "2", input$owndata_sign != "1", input$owndata_monotonicity != "1")) {
       owndata_optional_delta_check <- "If bounding relative magnitudes is included in base Delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions."
       owndata_optional_delta_js_string <- 'alert("SOMETHING");'
       owndata_optional_delta_js_string <- sub("SOMETHING",owndata_optional_delta_check,owndata_optional_delta_js_string)
@@ -774,7 +752,7 @@ server <- function(input, output, session) {
   # Alert below will trigger if FLCI or Conditional FLCI is chosen for any base restrictions other than single SD
   observe({
     if (all(input$owndata_method_rm %in% c("FLCI", "C-F"), 
-            "2" %in% input$owndata_delta)) {
+            input$owndata_delta != "2")) {
       owndata_flci_check <- "Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions."
       owndata_flci_js_string <- 'alert("SOMETHING");'
       owndata_flci_js_string <- sub("SOMETHING",owndata_flci_check,owndata_flci_js_string)
@@ -913,8 +891,8 @@ server <- function(input, output, session) {
 
   # Alert below will trigger if bounds of grid used for test inversion is filled when boudning relative magnitudes is not included in base Delta
   observe({
-    if (all(!("2" %in% input$owndata_delta), any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) {
-      owndata_grid_bound_check <- "Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 8 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid."
+    if (all(input$owndata_delta == "2", any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) {
+      owndata_grid_bound_check <- "Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid."
       owndata_grid_bound_js_string <- 'alert("SOMETHING");'
       owndata_grid_bound_js_string <- sub("SOMETHING",owndata_grid_bound_check,owndata_grid_bound_js_string)
       session$sendCustomMessage(type='jsCode', list(value = owndata_grid_bound_js_string))
@@ -976,9 +954,8 @@ server <- function(input, output, session) {
     #   }
     # } 
 
-    if (is.null(input$owndata_delta)) stop("At least one base choice of Delta must be selected.")
-    if (all("2" %in% input$owndata_delta, input$owndata_sign != "1", input$owndata_monotonicity != "1")) stop("If bounding relative magnitudes is included in base Delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions.")
-    if (all(input$owndata_method_rm %in% c("FLCI", "C-F"), "2" %in% input$owndata_delta)) stop("Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions.")
+    if (all(input$owndata_delta != "2", input$owndata_sign != "1", input$owndata_monotonicity != "1")) stop("If bounding relative magnitudes is included in base Delta, it is not allowed to select both shape (aka monotonicity) and sign restrictions as additions.")
+    if (all(input$owndata_method_rm %in% c("FLCI", "C-F"), input$owndata_delta != "2")) stop("Fixed Length Confidence Intervals or Conditional FLCI Hybrid is not suitable for base Delta that includes Bounding Relative Magnitudes, because it is proven that optimal FLCI has infinite length under those restrictions.")
 
     if (any(NA %in% (mod(as.numeric(unlist(strsplit(input$owndata_m_textinput,","))),1)!=0),any(as.numeric(unlist(strsplit(input$owndata_m_textinput,",")))<0))) stop("The vector of M must consist of numbers being seperated by commas. Numbers must be inon-negative. Please check examples in hints.")
     if (all(input$owndata_m_textinput !="", any(!is.na(input$owndata_m_lower), !is.na(input$owndata_m_upper), !is.na(input$owndata_m_step)))) stop("You can enter the vector of M EITHER arbitrarily OR as a sequence, but NOT both.")
@@ -996,7 +973,7 @@ server <- function(input, output, session) {
     if (any(mod(as.numeric(unlist(strsplit(input$owndata_lvec,","))),1)!=0)) stop("The vector that is used to determine parameter of interest must consist of integers.")
     if (any(as.numeric(unlist(strsplit(input$owndata_lvec,",")))<1)) stop("The vector that is used to determine parameter of interest must consist of integers that are not less than 1.")
     if (max(as.numeric(unlist(strsplit(input$owndata_lvec,","))))>length(owndata_data$postPeriodIndices)) stop("Numbers in the vector that is used to determine parameter of interest shouldn't be larger than the total length of post treatment periods.")
-    if (all(!("2" %in% input$owndata_delta), any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) stop("Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 8 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid.")
+    if (all(input$owndata_delta == "2", any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) stop("Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid.")
     if (any(all(!is.na(input$owndata_grid_lb), input$owndata_grid_lb>0), all(!is.na(input$owndata_grid_ub), input$owndata_grid_ub<0))) stop("Lower bound of grid used for underlying test inversion should be non-positive, and upper bound should be non-negative.")
     if (is.na(input$owndata_grid_points)) stop("Number of grid points shouldn't be empty.")
     if (all(!is.na(input$owndata_grid_points),any(mod(input$owndata_grid_points,1)!=0,input$owndata_grid_points < 1))) stop("Number of grid points should be positive integer.")
@@ -1014,7 +991,7 @@ server <- function(input, output, session) {
     
     owndata_sign <- if (input$owndata_sign=="2") "positive" else {if(input$owndata_sign =="3") "negative"}
     owndata_monotonicity <- if (input$owndata_monotonicity == "2") "increasing" else {if(input$owndata_monotonicity =="3") "decreasing"}
-    owndata_method_delta <- if ("2" %in% input$owndata_delta) input$owndata_method_rm else input$owndata_method_sd
+    owndata_method_delta <- if (input$owndata_delta != "2") input$owndata_method_rm else input$owndata_method_sd
     
     owndata_m_vector <- if (input$owndata_m_textinput !="") {
       unique(as.numeric(strsplit(input$owndata_m_textinput,",")[[1]]))
@@ -1034,7 +1011,7 @@ server <- function(input, output, session) {
       }
     }
     
-    owndata_mmbar_vector <- if ("2" %in% input$owndata_delta) owndata_mbar_vector else owndata_m_vector
+    owndata_mmbar_vector <- if (input$owndata_delta != "2") owndata_mbar_vector else owndata_m_vector
     
     # original OLS betahat
     owndata_originalResults <- constructOriginalCS(
@@ -1046,7 +1023,7 @@ server <- function(input, output, session) {
       alpha = input$owndata_alpha
     )
     
-    if (all(length(input$owndata_delta)==1 & input$owndata_delta == "2")) {
+    if (input$owndata_delta == "1") {
       owndata_delta_rm_results <- createSensitivityResults_relativeMagnitudes(
         betahat = owndata_data$beta, 
         sigma = owndata_data$sigma, 
@@ -1067,7 +1044,7 @@ server <- function(input, output, session) {
       owndata_v$result<-list(data=owndata_data,lvec=owndata_lvec,delta_rm_results=owndata_delta_rm_results, originalResults=owndata_originalResults, 
                              mmbar=owndata_mmbar_vector, weight=owndata_weight, sign=owndata_sign, monotonicity=owndata_monotonicity, alpha=input$owndata_alpha, method=owndata_method_delta, delta=input$owndata_delta, name=input$owndata_file$name, grid_points=input$owndata_grid_points, grid_lb=input$owndata_grid_lb, grid_ub=input$owndata_grid_ub, parallel=as.logical(input$owndata_parallel))
     } else {
-      if (all(length(input$owndata_delta)==1 & input$owndata_delta == "1")) {
+      if (input$owndata_delta == "2") {
         owndata_delta_sd_results <- createSensitivityResults(
           betahat = owndata_data$beta, 
           sigma = owndata_data$sigma, 
@@ -1141,7 +1118,7 @@ server <- function(input, output, session) {
   # ------------ Outputs -----------------------------
   # Alert below will trigger if lower bounds of confidence sets are exactly the same for different Mbar
   observe({
-    if (all("2" %in% owndata_v$result$delta,
+    if (all(owndata_v$result$delta != "2",
             any(duplicated(owndata_v$result$delta_rm_results$lb)))) {
       owndata_grid_lb_error_check <- "WARNING: It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
       owndata_grid_lb_error_js_string <- 'alert("SOMETHING");'
@@ -1152,7 +1129,7 @@ server <- function(input, output, session) {
   
   # Alert below will trigger if upper bounds of confidence sets are exactly the same for different Mbar
   observe({
-    if (all("2" %in% owndata_v$result$delta,
+    if (all(owndata_v$result$delta != "2",
             any(duplicated(owndata_v$result$delta_rm_results$ub)))) {
       owndata_grid_ub_error_check <- "WARNING: It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
       owndata_grid_ub_error_js_string <- 'alert("SOMETHING");'
@@ -1172,7 +1149,7 @@ server <- function(input, output, session) {
 
   # Hide or show step of grid used for test inversion
   observeEvent(input$owndata_delta,  {
-    if("2" %in% input$owndata_delta){
+    if(input$owndata_delta != "2"){
       show("owndata_grid_hint")
       show("owndata_grid_note")
       show("owndata_grid_lb")
@@ -1182,7 +1159,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$owndata_delta,  {
-    if(!("2" %in% input$owndata_delta)){
+    if(input$owndata_delta == "2"){
       hide("owndata_grid_hint")
       hide("owndata_grid_note")
       hide("owndata_grid_lb")
@@ -1214,7 +1191,7 @@ server <- function(input, output, session) {
   owndata_ssplot <- reactive({
     if (is.null(owndata_v$result)) return()
     
-    plot <-  if(all(length(owndata_v$result$delta)==1 & owndata_v$result$delta == "1")) {
+    plot <-  if(owndata_v$result$delta == "2") {
       createSensitivityPlot(owndata_v$result$delta_sd_results, owndata_v$result$originalResults)
     } else {
       createSensitivityPlot_relativeMagnitudes(owndata_v$result$delta_rm_results, owndata_v$result$originalResults)
@@ -1255,13 +1232,13 @@ server <- function(input, output, session) {
   output$owndata_grid_warning <- renderText({
     input$owndata_start
     if (is.null(owndata_v$result)) return()
-    owndata_gridwarning <- if (all("2" %in% owndata_v$result$delta, any(duplicated(owndata_v$result$delta_rm_results$lb)))) {
+    owndata_gridwarning <- if (all(owndata_v$result$delta != "2", any(duplicated(owndata_v$result$delta_rm_results$lb)))) {
       "\n It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
     } else {
-      if ((all("2" %in% owndata_v$result$delta, any(duplicated(owndata_v$result$delta_rm_results$ub))))) {
+      if ((all(owndata_v$result$delta != "2", any(duplicated(owndata_v$result$delta_rm_results$ub))))) {
         "\n It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
       } else {
-        if (all("2" %in% owndata_v$result$delta, any(duplicated(owndata_v$result$delta_rm_results$lb)), any(duplicated(owndata_v$result$delta_rm_results$ub)))) {
+        if (all(owndata_v$result$delta != "2", any(duplicated(owndata_v$result$delta_rm_results$lb)), any(duplicated(owndata_v$result$delta_rm_results$ub)))) {
           "\n It is detected that the bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small). You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how bounds of grid used for test inversion is defined by default."
         } else {NULL}
       }
@@ -1272,7 +1249,7 @@ server <- function(input, output, session) {
   # Sensitivity Data
   owndata_ssdata <- reactive({
     if (is.null(owndata_v$result)) return()
-    if(all(length(owndata_v$result$delta)==1 & owndata_v$result$delta == "1")) {   
+    if(owndata_v$result$delta == "2") {   
       owndata_v$result$delta_sd_results
     } else {
       owndata_v$result$delta_rm_results
@@ -1341,7 +1318,7 @@ server <- function(input, output, session) {
                     "\40 \40 alpha = ",owndata_v$result$alpha, "\n",
                     ") \n \n")
     
-    sensitivityAnalysis <- if (all(length(owndata_v$result$delta)==1 & owndata_v$result$delta == "2")) {
+    sensitivityAnalysis <- if (owndata_v$result$delta == "1") {
       c("# Create Sensitivity Result \n",
         "delta_rm_results <- createSensitivityResults_relativeMagnitudes( \n",
         "\40 \40 betahat = data$beta, \n",
@@ -1361,7 +1338,7 @@ server <- function(input, output, session) {
         "\40 \40 grid.ub = ",owndata_v$result$grid_ub,"\n",  
         ") \n \n")
     } else {
-      if (all(length(owndata_v$result$delta)==1 & owndata_v$result$delta == "1")) {
+      if (owndata_v$result$delta == "2") {
         c("# Create Sensitivity Result \n",
           "delta_sd_results <- createSensitivityResults( \n",
           "\40 \40 betahat = data$beta, \n",
@@ -1398,7 +1375,7 @@ server <- function(input, output, session) {
       }
     }
     
-    plot <- if(all(length(owndata_v$result$delta)==1 & owndata_v$result$delta == "1")) {
+    plot <- if(owndata_v$result$delta == "2") {
       c("# Create Sensitivity Plot \n",
         "sensitivity_plot <- createSensitivityPlot(delta_sd_results, originalResults) \n",
         "sensitivity_plot \n \n")
@@ -2076,3 +2053,4 @@ server <- function(input, output, session) {
   )
   
 }
+
