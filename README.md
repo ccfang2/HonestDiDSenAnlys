@@ -1,5 +1,5 @@
 # HonestDiD Sensitivity Analysis
-> This is a shiny app that facilitates the sensitivity analysis proposed in [Rambachan and Roth (2022)](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf) and is built on the R package: [HonestDiD](https://github.com/asheshrambachan/HonestDiD).
+> This is a shiny app that facilitates the sensitivity analysis proposed in [Rambachan and Roth (2022)](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf) and is built on the R package: [HonestDiD](https://github.com/asheshrambachan/HonestDiD). Latest Update: 2022-12-02
 
 ## About Sensitivity Analysis
 
@@ -22,7 +22,7 @@ shiny::runGitHub("HonestDiDSenAnlys", "ccfang2")
 ## About this app
 
 ### Screenshot
-<img width="1400" alt="Screen Shot" src="https://user-images.githubusercontent.com/100428466/204014024-f7d90467-bf91-465c-918f-470ae407431b.png">
+<img width="1407" alt="Screen Shot" src="https://user-images.githubusercontent.com/100428466/205441667-47289d87-668d-448e-b5e9-42c7aac32066.png">
 
 ### What does this app do for you
 1. Sensitivity analysis for example papers discussed in [Rambachan and Roth (2022)](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf)
