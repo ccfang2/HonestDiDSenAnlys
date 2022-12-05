@@ -380,9 +380,22 @@ server <- function(input, output, session) {
   })
   
   # ------------ Outputs -----------------------------
+  # Alert below will trigger if both lower and upper bounds of confidence sets are exactly the same for different Mbar
+  observe({
+    if (all(example_v$result$delta != "2",
+            any(duplicated(example_v$result$delta_rm_results$lb)),
+            any(duplicated(example_v$result$delta_rm_results$ub)))) {
+      example_grid_lb_ub_error_check <- "WARNING: It is detected that both lower and upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small). You need to decrease (increase) it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower and upper bound of grid used for test inversion is defined by default."
+      example_grid_lb_ub_error_js_string <- 'alert("SOMETHING");'
+      example_grid_lb_ub_error_js_string <- sub("SOMETHING",example_grid_lb_ub_error_check,example_grid_lb_ub_error_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = example_grid_lb_ub_error_js_string))
+    }
+  })
+  
   # Alert below will trigger if lower bounds of confidence sets are exactly the same for different Mbar
   observe({
     if (all(example_v$result$delta != "2",
+            sum(duplicated(example_v$result$delta_rm_results$ub))==0,
             any(duplicated(example_v$result$delta_rm_results$lb)))) {
       example_grid_lb_error_check <- "WARNING: It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to decrease it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
       example_grid_lb_error_js_string <- 'alert("SOMETHING");'
@@ -394,6 +407,7 @@ server <- function(input, output, session) {
   # Alert below will trigger if upper bounds of confidence sets are exactly the same for different Mbar
   observe({
     if (all(example_v$result$delta != "2",
+            sum(duplicated(example_v$result$delta_rm_results$lb))==0,
             any(duplicated(example_v$result$delta_rm_results$ub)))) {
       example_grid_ub_error_check <- "WARNING: It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to increase it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
       example_grid_ub_error_js_string <- 'alert("SOMETHING");'
@@ -496,14 +510,20 @@ server <- function(input, output, session) {
   output$example_grid_warning <- renderText({
     input$example_start
     if (is.null(example_v$result)) return()
-    example_gridwarning <- if (all(example_v$result$delta != "2", any(duplicated(example_v$result$delta_rm_results$lb)))) {
-      "\n It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to decrease it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
+    example_gridwarning <- if (all(example_v$result$delta != "2",
+                                   any(duplicated(example_v$result$delta_rm_results$lb)),
+                                   any(duplicated(example_v$result$delta_rm_results$ub)))) {
+      "\n It is detected that both lower and upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small). You need to decrease (increase) it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower and upper bound of grid used for test inversion is defined by default."
     } else {
-      if ((all(example_v$result$delta != "2", any(duplicated(example_v$result$delta_rm_results$ub))))) {
-        "\n It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to increase it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
+      if (all(example_v$result$delta != "2",
+              sum(duplicated(example_v$result$delta_rm_results$ub))==0,
+              any(duplicated(example_v$result$delta_rm_results$lb)))) {
+        "\n It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to decrease it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
       } else {
-        if (all(example_v$result$delta != "2", any(duplicated(example_v$result$delta_rm_results$lb)), any(duplicated(example_v$result$delta_rm_results$ub)))) {
-          "\n It is detected that the bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small). You need to decrease (increase) it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how bounds of grid used for test inversion is defined by default."
+        if (all(example_v$result$delta != "2",
+                sum(duplicated(example_v$result$delta_rm_results$lb))==0,
+                any(duplicated(example_v$result$delta_rm_results$ub)))) {
+          "\n It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to increase it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
         } else {NULL}
       }
     }
@@ -1116,11 +1136,24 @@ server <- function(input, output, session) {
   })
   
   # ------------ Outputs -----------------------------
+  # Alert below will trigger if both lower and upper bounds of confidence sets are exactly the same for different Mbar
+  observe({
+    if (all(owndata_v$result$delta != "2",
+            any(duplicated(owndata_v$result$delta_rm_results$lb)),
+            any(duplicated(owndata_v$result$delta_rm_results$ub)))) {
+      owndata_grid_lb_ub_error_check <- "WARNING: It is detected that both lower and upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small). You need to decrease (increase) it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower and upper bound of grid used for test inversion is defined by default."
+      owndata_grid_lb_ub_error_js_string <- 'alert("SOMETHING");'
+      owndata_grid_lb_ub_error_js_string <- sub("SOMETHING", owndata_grid_lb_ub_error_check, owndata_grid_lb_ub_error_js_string)
+      session$sendCustomMessage(type='jsCode', list(value = owndata_grid_lb_ub_error_js_string))
+    }
+  })
+  
   # Alert below will trigger if lower bounds of confidence sets are exactly the same for different Mbar
   observe({
     if (all(owndata_v$result$delta != "2",
+            sum(duplicated(owndata_v$result$delta_rm_results$ub))==0,
             any(duplicated(owndata_v$result$delta_rm_results$lb)))) {
-      owndata_grid_lb_error_check <- "WARNING: It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
+      owndata_grid_lb_error_check <- "WARNING: It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to decrease it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
       owndata_grid_lb_error_js_string <- 'alert("SOMETHING");'
       owndata_grid_lb_error_js_string <- sub("SOMETHING",owndata_grid_lb_error_check,owndata_grid_lb_error_js_string)
       session$sendCustomMessage(type='jsCode', list(value = owndata_grid_lb_error_js_string))
@@ -1130,8 +1163,9 @@ server <- function(input, output, session) {
   # Alert below will trigger if upper bounds of confidence sets are exactly the same for different Mbar
   observe({
     if (all(owndata_v$result$delta != "2",
+            sum(duplicated(owndata_v$result$delta_rm_results$lb))==0,
             any(duplicated(owndata_v$result$delta_rm_results$ub)))) {
-      owndata_grid_ub_error_check <- "WARNING: It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
+      owndata_grid_ub_error_check <- "WARNING: It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to increase it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
       owndata_grid_ub_error_js_string <- 'alert("SOMETHING");'
       owndata_grid_ub_error_js_string <- sub("SOMETHING",owndata_grid_ub_error_check,owndata_grid_ub_error_js_string)
       session$sendCustomMessage(type='jsCode', list(value = owndata_grid_ub_error_js_string))
@@ -1232,14 +1266,20 @@ server <- function(input, output, session) {
   output$owndata_grid_warning <- renderText({
     input$owndata_start
     if (is.null(owndata_v$result)) return()
-    owndata_gridwarning <- if (all(owndata_v$result$delta != "2", any(duplicated(owndata_v$result$delta_rm_results$lb)))) {
-      "\n It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
+    owndata_gridwarning <- if (all(owndata_v$result$delta != "2",
+                                   any(duplicated(owndata_v$result$delta_rm_results$lb)),
+                                   any(duplicated(owndata_v$result$delta_rm_results$ub)))) {
+      "\n It is detected that both lower and upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small). You need to decrease (increase) it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower and upper bound of grid used for test inversion is defined by default."
     } else {
-      if ((all(owndata_v$result$delta != "2", any(duplicated(owndata_v$result$delta_rm_results$ub))))) {
-        "\n It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
+      if (all(owndata_v$result$delta != "2",
+              sum(duplicated(owndata_v$result$delta_rm_results$ub))==0,
+              any(duplicated(owndata_v$result$delta_rm_results$lb)))) {
+        "\n It is detected that the lower bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower bound of grid used for underlying test inversion is too large. You need to decrease it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the lower bound of grid used for test inversion is defined by default."
       } else {
-        if (all(owndata_v$result$delta != "2", any(duplicated(owndata_v$result$delta_rm_results$lb)), any(duplicated(owndata_v$result$delta_rm_results$ub)))) {
-          "\n It is detected that the bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the lower (upper) bound of grid used for underlying test inversion is too large (small). You need to adjust it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how bounds of grid used for test inversion is defined by default."
+        if (all(owndata_v$result$delta != "2",
+                sum(duplicated(owndata_v$result$delta_rm_results$lb))==0,
+                any(duplicated(owndata_v$result$delta_rm_results$ub)))) {
+          "\n It is detected that the upper bounds of confidence sets at two or more different Mbar are exactly the same. This is due to the fact that the upper bound of grid used for underlying test inversion is too small. You need to increase it on the left pane to get correct confidence sets. Please go to [ More ] > [ FAQ ] for details on how the upper bound of grid used for test inversion is defined by default."
         } else {NULL}
       }
     }
