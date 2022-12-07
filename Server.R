@@ -167,14 +167,14 @@ server <- function(input, output, session) {
   })
 
   # Alert below will trigger if bounds of grid used for test inversion is filled when boudning relative magnitudes is not included in base Delta
-  observe({
-    if (all(input$example_delta == "2", any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) {
-      example_grid_bound_check <- "Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid."
-      example_grid_bound_js_string <- 'alert("SOMETHING");'
-      example_grid_bound_js_string <- sub("SOMETHING",example_grid_bound_check,example_grid_bound_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = example_grid_bound_js_string))
-    }
-  })
+  # observe({
+  #   if (all(input$example_delta == "2", any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) {
+  #     example_grid_bound_check <- "Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid."
+  #     example_grid_bound_js_string <- 'alert("SOMETHING");'
+  #     example_grid_bound_js_string <- sub("SOMETHING",example_grid_bound_check,example_grid_bound_js_string)
+  #     session$sendCustomMessage(type='jsCode', list(value = example_grid_bound_js_string))
+  #   }
+  # })
   
   # Alert below will trigger if upper bound of grid is negative or lower bound of grid is positive
   observe({
@@ -237,7 +237,7 @@ server <- function(input, output, session) {
     if (any(mod(as.numeric(unlist(strsplit(input$example_lvec,","))),1)!=0)) stop("The vector that is used to determine parameter of interest must consist of integers.")
     if (any(as.numeric(unlist(strsplit(input$example_lvec,",")))<1)) stop("The vector that is used to determine parameter of interest must consist of integers that are not less than 1.")
     if (max(as.numeric(unlist(strsplit(input$example_lvec,","))))>length(example_data$postPeriodIndices)) stop("Numbers in the vector that is used to determine parameter of interest shouldn't be larger than the total length of post treatment periods.")
-    if (all(input$example_delta == "2", any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) stop("Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid.")
+    #if (all(input$example_delta == "2", any(!is.na(input$example_grid_lb),!is.na(input$example_grid_ub)))) stop("Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid.")
     if (any(all(!is.na(input$example_grid_lb), input$example_grid_lb>0), all(!is.na(input$example_grid_ub), input$example_grid_ub<0))) stop("Lower bound of grid used for underlying test inversion should be non-positive, and upper bound should be non-negative.")
     if (is.na(input$example_grid_points)) stop("Number of grid points shouldn't be empty.")
     if (all(!is.na(input$example_grid_points),any(mod(input$example_grid_points,1)!=0,input$example_grid_points < 1))) stop("Number of grid points should be positive integer.")
@@ -910,14 +910,14 @@ server <- function(input, output, session) {
   })
 
   # Alert below will trigger if bounds of grid used for test inversion is filled when boudning relative magnitudes is not included in base Delta
-  observe({
-    if (all(input$owndata_delta == "2", any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) {
-      owndata_grid_bound_check <- "Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid."
-      owndata_grid_bound_js_string <- 'alert("SOMETHING");'
-      owndata_grid_bound_js_string <- sub("SOMETHING",owndata_grid_bound_check,owndata_grid_bound_js_string)
-      session$sendCustomMessage(type='jsCode', list(value = owndata_grid_bound_js_string))
-    }
-  })
+  # observe({
+  #   if (all(input$owndata_delta == "2", any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) {
+  #     owndata_grid_bound_check <- "Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid."
+  #     owndata_grid_bound_js_string <- 'alert("SOMETHING");'
+  #     owndata_grid_bound_js_string <- sub("SOMETHING",owndata_grid_bound_check,owndata_grid_bound_js_string)
+  #     session$sendCustomMessage(type='jsCode', list(value = owndata_grid_bound_js_string))
+  #   }
+  # })
   
   # Alert below will trigger if upper bound of grid is negative or lower bound of grid is positive
   observe({
@@ -993,7 +993,7 @@ server <- function(input, output, session) {
     if (any(mod(as.numeric(unlist(strsplit(input$owndata_lvec,","))),1)!=0)) stop("The vector that is used to determine parameter of interest must consist of integers.")
     if (any(as.numeric(unlist(strsplit(input$owndata_lvec,",")))<1)) stop("The vector that is used to determine parameter of interest must consist of integers that are not less than 1.")
     if (max(as.numeric(unlist(strsplit(input$owndata_lvec,","))))>length(owndata_data$postPeriodIndices)) stop("Numbers in the vector that is used to determine parameter of interest shouldn't be larger than the total length of post treatment periods.")
-    if (all(input$owndata_delta == "2", any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) stop("Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid.")
+    #if (all(input$owndata_delta == "2", any(!is.na(input$owndata_grid_lb),!is.na(input$owndata_grid_ub)))) stop("Bounds of grid used for underlying test inversion are only needed for the case when bounding relative magnitudes is included in base Delta. You need to expose [ Step 9 ] by clicking Bounding Relative Magnitudes again, and erase the values of bounds for grid.")
     if (any(all(!is.na(input$owndata_grid_lb), input$owndata_grid_lb>0), all(!is.na(input$owndata_grid_ub), input$owndata_grid_ub<0))) stop("Lower bound of grid used for underlying test inversion should be non-positive, and upper bound should be non-negative.")
     if (is.na(input$owndata_grid_points)) stop("Number of grid points shouldn't be empty.")
     if (all(!is.na(input$owndata_grid_points),any(mod(input$owndata_grid_points,1)!=0,input$owndata_grid_points < 1))) stop("Number of grid points should be positive integer.")
