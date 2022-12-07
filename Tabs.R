@@ -20,7 +20,7 @@ Home <- tabPanel("Home", icon = icon("house"),
                           )  
                    ),
                  hr(),
-                 h5(p("I hope you find this app useful and/or interesting. Any comments or questions are welcome at", a("ccfang[at]uni-bonn.de",href="mailto:ccfang@uni-bonn.de"),", and you are encouraged to report any issues", a("here.", href="https://github.com/ccfang2/HonestDiDSenAnlys/issues"), "[ Latest Update: 2022-12-05 ]")),
+                 h5(p("I hope you find this app useful and/or interesting. Any comments or questions are welcome at", a("ccfang[at]uni-bonn.de",href="mailto:ccfang@uni-bonn.de"),", and you are encouraged to report any issues", a("here.", href="https://github.com/ccfang2/HonestDiDSenAnlys/issues"), "[ Latest Update: 2022-12-07 ]")),
                  h5("Built with",
                     img(src = "shiny.png", height = "30px"),
                     "by",
