@@ -1,4 +1,11 @@
 # HonestDiD Sensitivity Analysis
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
+![GitHub last commit](https://img.shields.io/github/last-commit/ccfang2/HonestDiDSenAnlys?logo=GitHub)
+![GitHub repo size](https://img.shields.io/github/repo-size/ccfang2/HonestDiDSenAnlys)
+![GitHub Repo stars](https://img.shields.io/github/stars/ccfang2/HonestDiDSenAnlys?style=social)
+![Twitter Follow](https://img.shields.io/twitter/follow/ccfang819?logo=Twitter&style=social)
+
 > This is a shiny app that facilitates the sensitivity analysis proposed in [Rambachan and Roth (2022)](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf) and is built on the R package: [HonestDiD](https://github.com/asheshrambachan/HonestDiD). Latest Update: 2022-12-07
 
 ## About Sensitivity Analysis
